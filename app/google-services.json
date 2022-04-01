@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "818851489394",
+    "project_id": "mvvmchatapp-76ac2",
+    "storage_bucket": "mvvmchatapp-76ac2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:818851489394:android:4e23ef854932832e31c4eb",
+        "android_client_info": {
+          "package_name": "com.example.chatappfirebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "818851489394-0t3md837u5t19nbmuf6v1fgjnobf60sk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCeaQ84parUGEURr4IPAnAOSk4SiCr3JAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "818851489394-0t3md837u5t19nbmuf6v1fgjnobf60sk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
