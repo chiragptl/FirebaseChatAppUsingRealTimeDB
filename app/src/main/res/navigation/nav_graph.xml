@@ -6,6 +6,6 @@
 
     <fragment
         android:id="@+id/loginFregment"
-        android:name="com.example.chatappfirebase.LoginFregment"
+        android:name="com.example.chatappfirebase.login.LoginFragment"
         android:label="LoginFregment" />
 </navigation>

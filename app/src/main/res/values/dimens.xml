@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="font_huge">40sp</dimen>
+    <dimen name="font_larger">25sp</dimen>
+    <dimen name="font_large">20sp</dimen>
+    <dimen name="font_normal">15sp</dimen>
+    <dimen name="font_small">12sp</dimen>
+
+    <dimen name="spacing_max">75dp</dimen>
+    <dimen name="spacing_huge">40dp</dimen>
+    <dimen name="spacing_large">20dp</dimen>
+    <dimen name="spacing_normal">14dp</dimen>
+    <dimen name="spacing_small">10dp</dimen>
+    <dimen name="spacing_tiny">5dp</dimen>
+
+    <dimen name="height_huge">250dp</dimen>
+    <dimen name="height_taller">180dp</dimen>
+    <dimen name="height_tall">60dp</dimen>
+    <dimen name="height_normal">40dp</dimen>
+    <dimen name="height_short">32dp</dimen>
+    <dimen name="height_tiny">15dp</dimen>
+
+    <dimen name="width_huge">220dp</dimen>
+    <dimen name="width_taller">160dp</dimen>
+    <dimen name="width_tall">100dp</dimen>
+    <dimen name="width_normal">50dp</dimen>
+    <dimen name="width_short">25dp</dimen>
+    <dimen name="width_tiny">15dp</dimen>
+
+
+</resources>
