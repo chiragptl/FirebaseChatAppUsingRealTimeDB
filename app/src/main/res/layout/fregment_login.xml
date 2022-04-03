@@ -5,10 +5,32 @@
     android:layout_margin="@dimen/spacing_small">
 
     <TextView
+        android:id="@+id/nameTxt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:text="@string/enter_your_name"
+        android:textSize="@dimen/font_large" />
+
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/nameTxt"
+        android:layout_marginBottom="20dp"
+        android:autofillHints="number"
+        android:hint="@string/your_name"
+        android:inputType="text" />
+
+
+    <TextView
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:layout_below="@id/name"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
         android:text="@string/enter_your_phone_no"

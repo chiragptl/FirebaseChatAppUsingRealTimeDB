@@ -13,6 +13,7 @@ public class LoginViewModel extends AndroidViewModel {
     private final AppRepository appRepository;
     private final MutableLiveData<FirebaseUser> userMutableLiveData;
 
+
     public LoginViewModel(@NonNull Application application) {
         super(application);
 
@@ -21,8 +22,8 @@ public class LoginViewModel extends AndroidViewModel {
 
     }
 
-    public void authenticateNumber(String number, Activity activity){
-        appRepository.authenticateNumber(number,activity);
+    public void authenticateNumber(String name, String number, Activity activity){
+        appRepository.authenticateNumber(name, number,activity);
     }
 
     public void authenticateNumberManually(String number){
