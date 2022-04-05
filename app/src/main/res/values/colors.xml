@@ -7,4 +7,8 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="gray">#6a6a6a</color>
+    <color name="darkGray">#434343</color>
+    <color name="whatsappGreen">#075e54</color>
+    <color name="green">#25d366</color>
 </resources>

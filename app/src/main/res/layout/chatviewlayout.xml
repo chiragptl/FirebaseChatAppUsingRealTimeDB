@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="90dp"
+    android:background="@color/white">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/spacing_small"
+        android:paddingTop="@dimen/spacing_small"
+        android:paddingRight="@dimen/spacing_small"
+        android:paddingBottom="-5dp">
+        <TextView
+            android:id="@+id/nameofuser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_normal"
+            android:layout_marginTop="@dimen/spacing_normal"
+            android:layout_toEndOf="@id/cardviewofuser"
+            android:text="@string/name_display_here"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font_large"
+            android:textStyle="bold">
+
+        </TextView>
+
+
+        <TextView
+            android:id="@+id/statusofuser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/nameofuser"
+            android:layout_marginStart="@dimen/spacing_normal"
+            android:layout_marginTop="3dp"
+            android:layout_toEndOf="@id/cardviewofuser"
+            android:text="@string/status_displays_here"
+            android:textColor="@color/gray"
+            android:textSize="@dimen/font_small">
+
+        </TextView>
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardviewofuser"
+            android:layout_width="@dimen/width_normal"
+            android:layout_height="@dimen/width_normal"
+            android:layout_above="@+id/viewusername"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="@dimen/spacing_large"
+            app:cardCornerRadius="@dimen/width_normal">
+
+
+            <ImageView
+                android:id="@+id/imageviewofuser"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_launcher_background"
+                android:contentDescription="@string/app_name" />
+
+        </androidx.cardview.widget.CardView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:layout_below="@id/cardviewofuser"
+            android:layout_marginLeft="@dimen/spacing_small"
+            android:layout_marginTop="-5dp"
+            android:layout_toRightOf="@id/cardviewofuser"
+            android:background="@color/gray"
+            android:backgroundTint="@color/gray" />
+    </RelativeLayout>
+</RelativeLayout>

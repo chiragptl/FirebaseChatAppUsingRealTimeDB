@@ -14,6 +14,6 @@
     </fragment>
     <fragment
         android:id="@+id/dashboardFregment"
-        android:name="com.example.chatappfirebase.dashboard.DashboardFregment"
+        android:name="com.example.chatappfirebase.dashboard.DashboardFragment"
         android:label="DashboardFregment" />
 </navigation>

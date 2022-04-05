@@ -2,19 +2,14 @@ package com.example.chatappfirebase.login;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
-import androidx.navigation.Navigation;
 
 import com.example.chatappfirebase.MemoryData;
-import com.example.chatappfirebase.R;
-import com.example.chatappfirebase.dashboard.DashboardFregment;
-import com.example.chatappfirebase.dashboard.MessagesList;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -40,6 +35,7 @@ public class AppRepository {
     String verificationID;
     String phoneNumber;
     String name;
+    Bundle authData;
 
     public AppRepository(Application application) {
         this.application = application;
@@ -48,6 +44,7 @@ public class AppRepository {
         logedMutableLiveData = new MutableLiveData<>();
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://mvvmchatapp-76ac2-default-rtdb.firebaseio.com/");
+        authData = new Bundle();
     }
 
     public void authenticateNumber(String name, String phoneNumber, Activity activity) {
@@ -73,11 +70,12 @@ public class AppRepository {
             if(code!=null)
             {
                 authenticateNumberManually(code);
+                Log.d("autoLogin","AutoLogin");
             }
         }
         @Override
         public void onVerificationFailed(@NonNull FirebaseException e) {
-            Toast.makeText(application, "Verification Failed", Toast.LENGTH_SHORT).show();
+            Log.d("verificationFailed",e.getLocalizedMessage());
         }
 
         @Override
@@ -86,8 +84,15 @@ public class AppRepository {
         {
             super.onCodeSent(s, token);
             verificationID = s;
+            Log.d("code","code sent");
             Toast.makeText(application, "Code sent", Toast.LENGTH_SHORT).show();
+            authData.putString("number",phoneNumber);
+            authData.putString("code",verificationID);
         }};
+
+    public Bundle getAuthData() {
+        return authData;
+    }
 
     public void authenticateNumberManually(String code){
 
@@ -107,8 +112,8 @@ public class AppRepository {
                                 if(!snapshot.child("users").hasChild(phoneNumber)){
                                     databaseReference.child("users").child(phoneNumber).child("number").setValue(phoneNumber);
                                     databaseReference.child("users").child(phoneNumber).child("name").setValue(name);
-                                    MemoryData.saveData(phoneNumber, activity);
-                                    MemoryData.saveName(name, activity);
+//                                    MemoryData.saveData(phoneNumber, activity);
+//                                    MemoryData.saveName(name, activity);
                                     Log.d("databaseReference","added into firebase realtime");
                                 }
                             }
@@ -118,22 +123,15 @@ public class AppRepository {
 
                             }
                         });
-                        Toast.makeText(application, "Login Successfully", Toast.LENGTH_SHORT).show();
-//                        Navigation.findNavController(activity, R.id.action_loginFregment_to_dashboardFregment);
+                        Log.d("Login","Login Successfully");
                         logedMutableLiveData.postValue(true);
-                        Intent i = new Intent(application, DashboardFregment.class);
-                        i.putExtra("phone",phoneNumber);
-                        i.putExtra("name",name);
-                        application.startActivity(i);
 
                     }
                     else{
                         Toast.makeText(application, "Login Successfully not", Toast.LENGTH_SHORT).show();
                         logedMutableLiveData.postValue(false);
                     }
-
                 });
-
     }
 
     public MutableLiveData<Boolean> getLogedMutableLiveData() {

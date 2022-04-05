@@ -1,25 +1,58 @@
 package com.example.chatappfirebase;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.os.Bundle;
+import android.util.Log;
+
+import com.example.chatappfirebase.dashboard.DashboardFragment;
+import com.example.chatappfirebase.databinding.ActivityMainBinding;
+import com.example.chatappfirebase.login.LoginFragment;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
+
+    ActivityMainBinding binding;
+    Fragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        fragment = new LoginFragment();
+        fragmentRedirect(fragment);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        checkLogout();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkLogout();
+        Log.d("user","please Login manually");
+    }
+    private void checkLogout(){
+        if(fragment.getArguments()!=null){
+            if(fragment.getArguments().getBoolean("logout")) {
+                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+                firebaseAuth.signOut();
+                Log.d("logout","logout from mainactivity");
+            }
+        }
+    }
+
+    private void fragmentRedirect(Fragment fragment){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.replace, fragment);
+        fragmentTransaction.commit();
     }
 }
-/*
-Bundle[
-        {InAppSecondaryButtonText=Close,
-        InAppImagePortraitUrl=https://s3.amazonaws.com/cdn.skyscape.com/images/Emails/Springy2022_1.png,
-        InAppTitle=20220316_Test01,
-        InAppExpirationDateStamp=20220307,
-        InAppPrimaryButtonText=SHOP NOW,
-        InAppDescription=Use code: SPRINGY2022. Save now through 4/5/22,
-        InAppImageLandscapeUrl=https://s3.amazonaws.com/cdn.skyscape.com/images/Emails/Springy2022_2.png,
-        InAppPrimaryButtonAction=medpresso://skyscape?login#url=https://www.skyscape.com/estore/fullproductlisting.aspx?utm_source=FRB&utm_medium=PINAPP&utm_content=PROMO&utm_campaign=SPRINGY20220316}]
-
-*/
