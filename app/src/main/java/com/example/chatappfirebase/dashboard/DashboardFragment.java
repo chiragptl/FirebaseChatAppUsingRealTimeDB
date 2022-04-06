@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -32,10 +31,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class DashboardFragment extends Fragment {
 
     TabLayout tabLayout;
-    TabItem mchat;
+    TabItem mChat;
     ViewPager viewPager;
     PagerAdapter pagerAdapter;
-    androidx.appcompat.widget.Toolbar mtoolbar;
+    androidx.appcompat.widget.Toolbar mToolBar;
     FirebaseAuth firebaseAuth;
     FirebaseFirestore firebaseFirestore;
 
@@ -52,30 +51,31 @@ public class DashboardFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
         tabLayout = view.findViewById(R.id.include);
-        mchat = view.findViewById(R.id.chat);
-        viewPager = (ViewPager) view.findViewById(R.id.fragmentcontainer);
+        mChat = view.findViewById(R.id.chat);
+        viewPager = view.findViewById(R.id.fragmentcontainer);
 
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
 
-        mtoolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(mtoolbar);
+        mToolBar =view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(mToolBar);
 
         Drawable drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_more_vert_24);
-        mtoolbar.setOverflowIcon(drawable);
+        mToolBar.setOverflowIcon(drawable);
 
         pagerAdapter = new PagerAdapter(getChildFragmentManager());//getActivity().getSupportFragmentManager()
         viewPager.setAdapter(pagerAdapter);
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
-                if(tab.getPosition()==0 || tab.getPosition()==1)
-                {
-                    Log.d("tab","setOnTabSelectedListener" + tab.getPosition());
+                if (tab.getPosition() == 0 || tab.getPosition() == 1) {
+                    Log.d("tab", "setOnTabSelectedListener" + tab.getPosition());
                     pagerAdapter.notifyDataSetChanged();
                 }
             }
+
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
 
@@ -103,7 +103,8 @@ public class DashboardFragment extends Fragment {
             Log.d("logout", "Logout");
             Fragment fragment = new LoginFragment();
             Bundle bundle = new Bundle();
-            bundle.putBoolean("logout",true);
+            bundle.putBoolean("logout", true);
+            fragment.setArguments(bundle);
             redirectToFragment(fragment);
         }
         return true;
@@ -112,13 +113,6 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        DocumentReference documentReference = firebaseFirestore.collection("Users").document(firebaseAuth.getUid());
-        documentReference.update("status", "Offline").addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d("status", "Now User is Offline");
-            }
-        });
     }
 
     @Override
@@ -134,7 +128,8 @@ public class DashboardFragment extends Fragment {
             }
         });
     }
-    private void redirectToFragment(Fragment fragment){
+
+    private void redirectToFragment(Fragment fragment) {
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.replace, fragment);

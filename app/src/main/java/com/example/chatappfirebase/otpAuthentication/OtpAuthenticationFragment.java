@@ -28,12 +28,12 @@ import com.google.firebase.auth.PhoneAuthProvider;
 
 public class OtpAuthenticationFragment extends Fragment {
 
-    TextView mchangenumber;
-    EditText mgetotp;
-    android.widget.Button mverifyotp;
-    String enteredotp;
+    TextView mChangeNumber;
+    EditText mGetOtp;
+    android.widget.Button mVerifyOtp;
+    String enteredOtp;
     FirebaseAuth firebaseAuth;
-    ProgressBar mprogressbarofotpauth;
+    ProgressBar mProgressbarOfOtpAuth;
     private LoginViewModel loginViewModel;
 
 
@@ -48,13 +48,15 @@ public class OtpAuthenticationFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_otp_authentication, container, false);
 
-        mchangenumber = view.findViewById(R.id.changenumber);
-        mverifyotp = view.findViewById(R.id.verifyotp);
-        mgetotp = view.findViewById(R.id.getotp);
-        mprogressbarofotpauth = view.findViewById(R.id.progressbarofotpauth);
+        mChangeNumber = view.findViewById(R.id.changenumber);
+        mVerifyOtp = view.findViewById(R.id.verifyotp);
+        mGetOtp = view.findViewById(R.id.getotp);
+        mProgressbarOfOtpAuth = view.findViewById(R.id.progressbarofotpauth);
         firebaseAuth = FirebaseAuth.getInstance();
 
-        mchangenumber.setOnClickListener(new View.OnClickListener() {
+
+
+        mChangeNumber.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Fragment fragment = new LoginFragment();
@@ -62,27 +64,16 @@ public class OtpAuthenticationFragment extends Fragment {
             }
         });
 
-        mverifyotp.setOnClickListener(new View.OnClickListener() {
+        mVerifyOtp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                enteredotp = mgetotp.getText().toString();
-                String phone = getArguments().getString("number");
-                Log.d("phone",phone+" from bundle");
-                if (enteredotp.isEmpty()) {
+                enteredOtp = mGetOtp.getText().toString();
+                if (enteredOtp.isEmpty()) {
                     Log.d("otp", "Empty");
                 } else {
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    if (user != null) {
-                        String number = user.getPhoneNumber();
-                        Log.d("phone",number +" from firebase user");
-                        if(phone.equals(number)) {
-                            Fragment fragment = new DashboardFragment();
-                            fragmentRedirect(fragment);
-                        }
-                    }
-                    mprogressbarofotpauth.setVisibility(View.VISIBLE);
+                    mProgressbarOfOtpAuth.setVisibility(View.VISIBLE);
                     String codeReceived = getArguments().getString("code");
-                    PhoneAuthCredential credential = PhoneAuthProvider.getCredential(codeReceived, enteredotp);
+                    PhoneAuthCredential credential = PhoneAuthProvider.getCredential(codeReceived, enteredOtp);
                     signInWithCredential(credential);
                 }
             }
@@ -102,10 +93,27 @@ public class OtpAuthenticationFragment extends Fragment {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Log.d("login", "Login Successfully");
-                        Fragment fragment = new SetProfileFragment();
-                        Bundle authData = loginViewModel.getAuthData();
-                        fragment.setArguments(authData);
-                        fragmentRedirect(fragment);
+                        if(getArguments() != null) {
+                            String phoneBundle = "+91"+ getArguments().getString("number");
+                            Log.d("phone", phoneBundle + " from bundle");
+                            FirebaseUser user = firebaseAuth.getCurrentUser();
+                            if (user != null) {
+                                String number = user.getPhoneNumber();
+                                Log.d("phone", number + " from firebase user");
+                                if (phoneBundle.equalsIgnoreCase(number)) {
+                                    Fragment fragment = new DashboardFragment();
+                                    Bundle authData = loginViewModel.getAuthData();
+                                    fragment.setArguments(authData);
+                                    fragmentRedirect(fragment);
+                                }
+                            }
+                        }
+                        else {
+                            Fragment fragment = new SetProfileFragment();
+                            Bundle authData = loginViewModel.getAuthData();
+                            fragment.setArguments(authData);
+                            fragmentRedirect(fragment);
+                        }
                     } else {
                         Log.d("login", "Login failed");
                     }

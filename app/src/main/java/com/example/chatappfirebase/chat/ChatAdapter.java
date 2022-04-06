@@ -31,6 +31,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
         this.fragmentManager = fragmentManager;
     }
 
+
     @NonNull
     @Override
     public ChatAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -46,7 +47,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
         holder.particularusername.setText(chatModel.getName());
         Picasso.get().load(R.drawable.defaultprofile).into(holder.mimageviewofuser);
         holder.statusofuser.setText(chatModel.getStatus());
-
         holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -54,7 +54,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
                         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                         Bundle individualChatData = new Bundle();
                         individualChatData.putString("name",chatModel.getName());
-                        individualChatData.putString("receiveruid",chatModel.getUid());
+                        individualChatData.putString("receiverUid",chatModel.getUid());
                         individualChatData.putString("imageuri",chatModel.getImage());
                         individualChatData.putString("status",chatModel.getName());
                         fragment.setArguments(individualChatData);

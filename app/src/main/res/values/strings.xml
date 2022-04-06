@@ -21,4 +21,5 @@
     <string name="sender_message_display_here">Sender Message Display Here</string>
     <string name="_20_09">20:09</string>
     <string name="logout">logout</string>
+    <string name="type_message">Type a message</string>
 </resources>

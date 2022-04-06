@@ -28,7 +28,7 @@ public class ChatFragment extends Fragment {
     private FirebaseAuth firebaseAuth;
     ArrayList<FirebaseChatModel> firebaseChatModelArrayList;
     ChatAdapter myChatAdapter;
-    RecyclerView mrecyclerview;
+    RecyclerView mRecyclerview;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,67 +42,20 @@ public class ChatFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_chat,container,false);
         firebaseAuth=FirebaseAuth.getInstance();
         firebaseFirestore= FirebaseFirestore.getInstance();
-        mrecyclerview=view.findViewById(R.id.recyclerview);
+        mRecyclerview =view.findViewById(R.id.recyclerview);
 
-        mrecyclerview.setHasFixedSize(true);
+        mRecyclerview.setHasFixedSize(true);
         linearLayoutManager=new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
-        mrecyclerview.setLayoutManager(linearLayoutManager);
+        mRecyclerview.setLayoutManager(linearLayoutManager);
 
         firebaseChatModelArrayList = new ArrayList<>();
         myChatAdapter = new ChatAdapter(getContext(),firebaseChatModelArrayList, getActivity().getSupportFragmentManager());
 
-        mrecyclerview.setAdapter(myChatAdapter);
+        mRecyclerview.setAdapter(myChatAdapter);
         eventChangeListener();
         Log.d("currentUser",firebaseAuth.getCurrentUser().getUid());
         Log.d("chatFragment","onCreateView");
-
-//        chatAdapter=new FirestoreRecyclerAdapter<FirebaseChatModel, NoteViewHolder>(allUserName) {
-//            @Override
-//            protected void onBindViewHolder(@NonNull NoteViewHolder noteViewHolder, int i, @NonNull FirebaseChatModel firebasemodel) {
-//
-//                noteViewHolder.particularusername.setText(firebasemodel.getName());
-//                String uri=firebasemodel.getImage();
-//                if(!uri.isEmpty()) {
-//                    Picasso.get().load(uri).into(mimageviewofuser);
-//                }else{
-//                    Picasso.get().load(R.drawable.defaultprofile).into(mimageviewofuser);
-//                }
-//                if(firebasemodel.getStatus().equals("Online"))
-//                {
-//                    noteViewHolder.statusofuser.setText(firebasemodel.getStatus());
-//                    noteViewHolder.statusofuser.setTextColor(Color.GREEN);
-//                }
-//                else
-//                {
-//                    noteViewHolder.statusofuser.setText(firebasemodel.getStatus());
-//                }
-//
-//                noteViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        Fragment fragment = new IndividualChatFragment();
-//                        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-//                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//                        Bundle individualChatData = new Bundle();
-//                        individualChatData.putString("name",firebasemodel.getName());
-//                        individualChatData.putString("receiveruid",firebasemodel.getName());
-//                        individualChatData.putString("imageuri",firebasemodel.getName());
-//                        individualChatData.putString("name",firebasemodel.getName());
-//                        fragment.setArguments(individualChatData);
-//                        fragmentTransaction.replace(R.id.replace, fragment);
-//                        fragmentTransaction.commit();
-//                    }
-//                });
-//            }
-//            @NonNull
-//            @Override
-//            public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-//
-//                View view=LayoutInflater.from(parent.getContext()).inflate(R.layout.chatviewlayout,parent,false);
-//                return new NoteViewHolder(view);
-//            }
-//        };
         return view;
     }
 
@@ -117,9 +70,13 @@ public class ChatFragment extends Fragment {
                             return;
                         }
                         for (DocumentChange documentChange: value.getDocumentChanges()){
-                            firebaseChatModelArrayList.add(documentChange.getDocument().toObject(FirebaseChatModel.class));
+                            FirebaseChatModel firebaseChat = documentChange.getDocument().toObject(FirebaseChatModel.class);
+                            if (!firebaseChatModelArrayList.contains(firebaseChat)) {
+                                firebaseChatModelArrayList.add(firebaseChat);
+                            }
                         }
-                        myChatAdapter.notifyDataSetChanged();
+                        myChatAdapter.notifyItemRangeInserted(myChatAdapter.getItemCount(),firebaseChatModelArrayList.size());
+//                        myChatAdapter.notifyDataSetChanged();
                     }
                 });
     }

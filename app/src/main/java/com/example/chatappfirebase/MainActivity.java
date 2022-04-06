@@ -12,44 +12,36 @@ import com.example.chatappfirebase.dashboard.DashboardFragment;
 import com.example.chatappfirebase.databinding.ActivityMainBinding;
 import com.example.chatappfirebase.login.LoginFragment;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
-    Fragment fragment;
+    FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        fragment = new LoginFragment();
-        fragmentRedirect(fragment);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        checkLogout();
+        Fragment fragment = new LoginFragment();
+        FragmentRedirect(fragment);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        checkLogout();
-        Log.d("user","please Login manually");
-    }
-    private void checkLogout(){
-        if(fragment.getArguments()!=null){
-            if(fragment.getArguments().getBoolean("logout")) {
-                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-                firebaseAuth.signOut();
-                Log.d("logout","logout from mainactivity");
-            }
+        firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        if (user != null) {
+            String number = user.getPhoneNumber();
+            Log.d("phone",number +" from firebase user on resume");
+            Fragment fragment = new DashboardFragment();
+            FragmentRedirect(fragment);
         }
     }
 
-    private void fragmentRedirect(Fragment fragment){
+    private void FragmentRedirect(Fragment fragment){
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.replace, fragment);

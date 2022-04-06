@@ -82,7 +82,7 @@
         android:layout_marginRight="@dimen/width_normal"
         android:layout_marginBottom="@dimen/spacing_tiny"
         android:background="@drawable/messagebackground"
-        android:hint="Type a message"
+        android:hint="@string/type_message"
         android:paddingLeft="@dimen/spacing_large"
         android:paddingEnd="@dimen/spacing_small"
         android:textAlignment="textStart"

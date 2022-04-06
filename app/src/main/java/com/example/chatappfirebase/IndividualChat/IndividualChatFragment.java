@@ -1,7 +1,9 @@
 package com.example.chatappfirebase.IndividualChat;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +32,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -39,30 +40,30 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class IndividualChatFragment extends Fragment {
-    EditText mgetmessage;
-    ImageButton msendmessagebutton;
+    EditText mGetMessage;
+    ImageButton mSendMessageButton;
 
-    CardView msendmessagecardview;
-    androidx.appcompat.widget.Toolbar mtoolbarofspecificchat;
-    ImageView mimageviewofspecificuser;
-    TextView mnameofspecificuser;
+    CardView mSendMessageCardView;
+    androidx.appcompat.widget.Toolbar mToolbarOfSpecificChat;
+    ImageView mImageviewOfSpecificUser;
+    TextView mNameOfSpecificUser;
 
-    private String enteredmessage;
-    String mrecievername, sendername, mrecieveruid, msenderuid;
+    private String enteredMessage;
+    String mReceiverName, mReceiverUid, mSenderUid;
     private FirebaseAuth firebaseAuth;
     FirebaseDatabase firebaseDatabase;
-    String senderroom, recieverroom;
+    String senderReceiver, receiverSender;
 
-    ImageButton mbackbuttonofspecificchat;
+    ImageButton mBackButtonOfSpecificChat;
 
-    RecyclerView mmessagerecyclerview;
+    RecyclerView mMessageRecyclerView;
 
-    String currenttime;
+    String currentTime;
     Calendar calendar;
     SimpleDateFormat simpleDateFormat;
 
     IndividualChatMessageAdapter messagesAdapter;
-    ArrayList<Messages> messagesArrayList;
+    ProgressDialog progressBar;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,26 +75,31 @@ public class IndividualChatFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_individual_chat, container, false);
 
-        mgetmessage = view.findViewById(R.id.getmessage);
-        msendmessagecardview = view.findViewById(R.id.carviewofsendmessage);
-        msendmessagebutton = view.findViewById(R.id.imageviewsendmessage);
-        mtoolbarofspecificchat = view.findViewById(R.id.toolbarofspecificchat);
-        mnameofspecificuser = view.findViewById(R.id.Nameofspecificuser);
-        mimageviewofspecificuser = view.findViewById(R.id.specificuserimageinimageview);
-        mbackbuttonofspecificchat = view.findViewById(R.id.backbuttonofspecificchat);
+        mGetMessage = view.findViewById(R.id.getmessage);
+        mSendMessageCardView = view.findViewById(R.id.carviewofsendmessage);
+        mSendMessageButton = view.findViewById(R.id.imageviewsendmessage);
+        mToolbarOfSpecificChat = view.findViewById(R.id.toolbarofspecificchat);
+        mNameOfSpecificUser = view.findViewById(R.id.Nameofspecificuser);
+        mImageviewOfSpecificUser = view.findViewById(R.id.specificuserimageinimageview);
+        mBackButtonOfSpecificChat = view.findViewById(R.id.backbuttonofspecificchat);
 
-        messagesArrayList = new ArrayList<>();
-        mmessagerecyclerview = view.findViewById(R.id.recyclerviewofspecific);
+        progressBar = new ProgressDialog(getActivity());
+        progressBar.setCancelable(true);
+        progressBar.setMessage("Loading Chats ...");
+        progressBar.show();
+
+        mMessageRecyclerView = view.findViewById(R.id.recyclerviewofspecific);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setStackFromEnd(true);
-        mmessagerecyclerview.setLayoutManager(linearLayoutManager);
+        mMessageRecyclerView.setLayoutManager(linearLayoutManager);
 
-        messagesAdapter = new IndividualChatMessageAdapter(getContext(), messagesArrayList);
-        mmessagerecyclerview.setAdapter(messagesAdapter);
+        messagesAdapter = new IndividualChatMessageAdapter(getContext());
+        mMessageRecyclerView.setAdapter(messagesAdapter);
 
-        ((AppCompatActivity) getActivity()).setSupportActionBar(mtoolbarofspecificchat);
-        mtoolbarofspecificchat.setOnClickListener(new View.OnClickListener() {
+
+        ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbarOfSpecificChat);
+        mToolbarOfSpecificChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.d("toolbar", "Toolbar is Clicked");
@@ -105,31 +111,62 @@ public class IndividualChatFragment extends Fragment {
         calendar = Calendar.getInstance();
         simpleDateFormat = new SimpleDateFormat("hh:mm a");
 
-        msenderuid = firebaseAuth.getUid();
-        mrecieveruid = getArguments().getString("receiveruid");
-        mrecievername = getArguments().getString("name");
-        senderroom = msenderuid + mrecieveruid;
-        recieverroom = mrecieveruid + msenderuid;
+        mSenderUid = firebaseAuth.getUid();
+        Bundle bundleData = getArguments();
+        mReceiverUid = bundleData.getString("receiverUid");
+        mReceiverName = bundleData.getString("name");
+        senderReceiver = mSenderUid + mReceiverUid;
+        receiverSender = mReceiverUid + mSenderUid;
 
-        DatabaseReference databaseReference = firebaseDatabase.getReference().child("chats").child(senderroom).child("messages");
-        messagesAdapter = new IndividualChatMessageAdapter(getContext(), messagesArrayList);
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        DatabaseReference databaseReference = firebaseDatabase.getReference().child("chats").child(senderReceiver).child("messages");
+
+        databaseReference.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                messagesArrayList.clear();
-                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    Messages messages = snapshot1.getValue(Messages.class);
-                    Log.d("message",messages.getMessage()+" "+messages.getSenderId());
-                    messagesArrayList.add(messages);
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                Log.d("snapshot", "snapshot count: "+snapshot.getChildrenCount());
+                messagesAdapter.add(snapshot.getValue(Messages.class));
+                if (progressBar.isShowing())
+                {
+                    Log.d("ProgressBar", "dismiss");
+                    progressBar.dismiss();
                 }
-                messagesAdapter.notifyDataSetChanged();
+                Log.d("ADAPTER","ON DATA CHANGE");
             }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                Messages messages = snapshot.getValue(Messages.class);
+
+                Log.d("onChildChanged",messages.getSenderId()+" "+messages.getTimestamp());
+                int index = messagesAdapter.findIndex(messages.getSenderId(),messages.getTimestamp());
+                Log.d("onChildChanged", "onChildChanged: index "+index);
+                Log.d("change",messages.getMessage()+" " +previousChildName);
+                messagesAdapter.update(messages,index);
+                Log.d("message",messages.getMessage()+" "+messages.getSenderId());
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
+        if (progressBar.isShowing())
+        {
+            Log.d("ProgressBar", "dismiss");
+            progressBar.dismiss();
+        }
 
-        mbackbuttonofspecificchat.setOnClickListener(new View.OnClickListener() {
+        mBackButtonOfSpecificChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Fragment fragment = new DashboardFragment();
@@ -137,28 +174,28 @@ public class IndividualChatFragment extends Fragment {
             }
         });
 
-        mnameofspecificuser.setText(mrecievername);
-        Picasso.get().load(R.drawable.defaultprofile).into(mimageviewofspecificuser);
-        msendmessagebutton.setOnClickListener(new View.OnClickListener() {
+        mNameOfSpecificUser.setText(mReceiverName);
+        Picasso.get().load(R.drawable.defaultprofile).into(mImageviewOfSpecificUser);
+        mSendMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                enteredmessage = mgetmessage.getText().toString();
-                if (enteredmessage.isEmpty()) {
+                enteredMessage = mGetMessage.getText().toString();
+                if (enteredMessage.isEmpty()) {
                     Log.d("message", "Enter message first");
                 } else {
                     Date date = new Date();
-                    currenttime = simpleDateFormat.format(calendar.getTime());
-                    Messages messages = new Messages(enteredmessage, firebaseAuth.getUid(), date.getTime(), currenttime);
+                    currentTime = simpleDateFormat.format(calendar.getTime());
+                    Messages messages = new Messages(enteredMessage, firebaseAuth.getUid(), date.getTime(), currentTime);
                     firebaseDatabase = FirebaseDatabase.getInstance();
                     firebaseDatabase.getReference().child("chats")
-                            .child(senderroom)
+                            .child(senderReceiver)
                             .child("messages")
                             .push().setValue(messages).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             firebaseDatabase.getReference()
                                     .child("chats")
-                                    .child(recieverroom)
+                                    .child(receiverSender)
                                     .child("messages")
                                     .push()
                                     .setValue(messages).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -169,7 +206,7 @@ public class IndividualChatFragment extends Fragment {
                             });
                         }
                     });
-                    mgetmessage.setText(null);
+                    mGetMessage.setText(null);
                 }
             }
         });
@@ -179,15 +216,32 @@ public class IndividualChatFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        messagesAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        if (messagesAdapter != null) {
-            messagesAdapter.notifyDataSetChanged();
-        }
+    public void onResume() {
+        super.onResume();
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                if (keyEvent.getAction() == KeyEvent.ACTION_UP && i == KeyEvent.KEYCODE_BACK){
+                    Log.d("Back Button","back button pressed");
+                    Fragment fragment = new DashboardFragment();
+                    redirectToFragment(fragment);
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Fragment fragment = new DashboardFragment();
+        redirectToFragment(fragment);
     }
 
     private void redirectToFragment(Fragment fragment){
@@ -197,4 +251,3 @@ public class IndividualChatFragment extends Fragment {
         fragmentTransaction.commit();
     }
 }
-

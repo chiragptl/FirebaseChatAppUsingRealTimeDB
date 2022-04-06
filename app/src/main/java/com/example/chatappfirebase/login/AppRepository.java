@@ -4,23 +4,21 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.chatappfirebase.MemoryData;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.concurrent.TimeUnit;
 
@@ -30,7 +28,7 @@ public class AppRepository {
     DatabaseReference databaseReference;
     private final MutableLiveData<FirebaseUser> firebaseUserMutableLiveData;
     private final MutableLiveData<Boolean> logoutMutableLiveData;
-    private final MutableLiveData<Boolean> logedMutableLiveData;
+    private final MutableLiveData<Boolean> loginMutableLiveData;
     Activity activity;
     String verificationID;
     String phoneNumber;
@@ -41,7 +39,7 @@ public class AppRepository {
         this.application = application;
         firebaseUserMutableLiveData = new MutableLiveData<>();
         logoutMutableLiveData = new MutableLiveData<>();
-        logedMutableLiveData = new MutableLiveData<>();
+        loginMutableLiveData = new MutableLiveData<>();
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://mvvmchatapp-76ac2-default-rtdb.firebaseio.com/");
         authData = new Bundle();
@@ -51,6 +49,7 @@ public class AppRepository {
         this.activity = activity;
         this.name = name;
         this.phoneNumber = phoneNumber;
+        Log.d("phone", this.phoneNumber + " from authenticateNumber");
         Log.d("getClass",application.getClass().toString());
         PhoneAuthOptions options =
                 PhoneAuthOptions.newBuilder(firebaseAuth)
@@ -87,7 +86,9 @@ public class AppRepository {
             Log.d("code","code sent");
             Toast.makeText(application, "Code sent", Toast.LENGTH_SHORT).show();
             authData.putString("number",phoneNumber);
+            Log.d("phone",phoneNumber + " from after code sent");
             authData.putString("code",verificationID);
+            authData.putBoolean("logout",false);
         }};
 
     public Bundle getAuthData() {
@@ -106,36 +107,18 @@ public class AppRepository {
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful())
                     {
-                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if(!snapshot.child("users").hasChild(phoneNumber)){
-                                    databaseReference.child("users").child(phoneNumber).child("number").setValue(phoneNumber);
-                                    databaseReference.child("users").child(phoneNumber).child("name").setValue(name);
-//                                    MemoryData.saveData(phoneNumber, activity);
-//                                    MemoryData.saveName(name, activity);
-                                    Log.d("databaseReference","added into firebase realtime");
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
                         Log.d("Login","Login Successfully");
-                        logedMutableLiveData.postValue(true);
-
+                        loginMutableLiveData.postValue(true);
                     }
                     else{
                         Toast.makeText(application, "Login Successfully not", Toast.LENGTH_SHORT).show();
-                        logedMutableLiveData.postValue(false);
+                        loginMutableLiveData.postValue(false);
                     }
                 });
     }
 
-    public MutableLiveData<Boolean> getLogedMutableLiveData() {
-        return logedMutableLiveData;
+    public MutableLiveData<Boolean> getLoginMutableLiveData() {
+        return loginMutableLiveData;
     }
 
     public void logOut(){

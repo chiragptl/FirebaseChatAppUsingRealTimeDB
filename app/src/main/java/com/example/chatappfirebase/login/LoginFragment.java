@@ -29,22 +29,14 @@ public class LoginFragment extends Fragment {
     ProgressBar bar;
 
     private LoginViewModel loginViewModel;
+    protected FirebaseAuth firebaseAuth;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        firebaseAuth = FirebaseAuth.getInstance();
         checkLogout();
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
-//        loginViewModel.getUserMutableLiveData().observe(this, new Observer<FirebaseUser>() {
-//            @Override
-//            public void onChanged(FirebaseUser firebaseUser) {
-//                if(firebaseUser != null){
-//                    Log.d("user","onChange Already Log In");
-//                    Fragment fragment = new DashboardFragment();
-//                    redirectToFragment(fragment);
-//                }
-//            }
-//        });
     }
 
     @Nullable
@@ -65,6 +57,7 @@ public class LoginFragment extends Fragment {
             else {
                 String number = phone.getText().toString();
                 bar.setVisibility(View.VISIBLE);
+                Log.d("phone",number + " from user input");
                 loginViewModel.authenticateNumber("null", number, getActivity());
                 bar.setVisibility(View.INVISIBLE);
                 Fragment fragment = new OtpAuthenticationFragment();
@@ -97,8 +90,8 @@ public class LoginFragment extends Fragment {
     private void checkLogout(){
         if(getArguments()!=null){
             if(getArguments().getBoolean("logout")) {
-                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
                 firebaseAuth.signOut();
+                Log.d("signOut","user Logout");
             }
         }
     }
