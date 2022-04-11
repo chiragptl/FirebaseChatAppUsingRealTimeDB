@@ -1,4 +1,4 @@
-package com.example.chatappfirebase.IndividualChat;
+package com.example.chatappfirebase.individualChat;
 
 import android.content.Context;
 import android.util.Log;
@@ -14,36 +14,24 @@ import com.example.chatappfirebase.R;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class IndividualChatMessageAdapter extends RecyclerView.Adapter {
-    Context context;
-    ArrayList<Messages> messagesArrayList = new ArrayList<>();
+public class IndividualChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    final Context context;
 
-    int ITEM_SEND = 1;
-    int ITEM_RECEIVE = 2;
+    public ArrayList<Messages> getMessagesArrayList() {
+        return messagesArrayList;
+    }
+
+    final ArrayList<Messages> messagesArrayList = new ArrayList<>();
+
+    final int ITEM_SEND = 1;
+    final int ITEM_RECEIVE = 2;
 
     public void add(Messages addMessage) {
         messagesArrayList.add(addMessage);
         Log.d("add", "add: single value");
         notifyItemInserted(messagesArrayList.size());
-    }
-
-    public void addAll(ArrayList<Messages> addAllMessage) {
-        this.messagesArrayList.addAll(addAllMessage);
-        Log.d("add", "add: all value");
-        notifyItemRangeInserted(getItemCount(), addAllMessage.size());
-    }
-
-    public int findIndex(String senderId, long timeStamp){
-        int index = -1;
-        for (Messages msg: messagesArrayList) {
-            index++;
-            if(msg.getSenderId().equalsIgnoreCase(senderId) && msg.getTimestamp() == timeStamp);
-            {
-                return index;
-            }
-        }
-        return index;
     }
 
     public void update(Messages messages, int index) {
@@ -76,17 +64,20 @@ public class IndividualChatMessageAdapter extends RecyclerView.Adapter {
             SenderViewHolder viewHolder = (SenderViewHolder) holder;
             viewHolder.textViewMessage.setText(messages.getMessage());
             viewHolder.timeOfMessage.setText(messages.getCurrenttime());
+            Log.d("currentTime", "sender "+messages.getCurrenttime());
         } else {
             ReceiverViewHolder viewHolder = (ReceiverViewHolder) holder;
             viewHolder.textViewMessage.setText(messages.getMessage());
             viewHolder.timeOfMessage.setText(messages.getCurrenttime());
+            Log.d("currentTime", "receiver "+messages.getCurrenttime());
+
         }
     }
 
     @Override
     public int getItemViewType(int position) {
         Messages messages = messagesArrayList.get(position);
-        if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(messages.getSenderId())) {
+        if (Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid().equals(messages.getSenderId())) {
             return ITEM_SEND;
         } else {
             return ITEM_RECEIVE;
@@ -98,25 +89,25 @@ public class IndividualChatMessageAdapter extends RecyclerView.Adapter {
         return messagesArrayList.size();
     }
 
-    class SenderViewHolder extends RecyclerView.ViewHolder {
-        TextView textViewMessage;
-        TextView timeOfMessage;
+    static class SenderViewHolder extends RecyclerView.ViewHolder {
+        final TextView textViewMessage;
+        final TextView timeOfMessage;
 
         public SenderViewHolder(@NonNull View itemView) {
             super(itemView);
-            textViewMessage = itemView.findViewById(R.id.sendermessage);
-            timeOfMessage = itemView.findViewById(R.id.timeofmessage);
+            textViewMessage = itemView.findViewById(R.id.senderMessage);
+            timeOfMessage = itemView.findViewById(R.id.timeOfMessage);
         }
     }
 
-    class ReceiverViewHolder extends RecyclerView.ViewHolder {
-        TextView textViewMessage;
-        TextView timeOfMessage;
+    static class ReceiverViewHolder extends RecyclerView.ViewHolder {
+        final TextView textViewMessage;
+        final TextView timeOfMessage;
 
         public ReceiverViewHolder(@NonNull View itemView) {
             super(itemView);
-            textViewMessage = itemView.findViewById(R.id.sendermessage);
-            timeOfMessage = itemView.findViewById(R.id.timeofmessage);
+            textViewMessage = itemView.findViewById(R.id.senderMessage);
+            timeOfMessage = itemView.findViewById(R.id.timeOfMessage);
         }
     }
 

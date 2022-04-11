@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent" android:layout_height="wrap_content"
     android:padding="2dp">
 
@@ -8,8 +9,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_marginEnd="@dimen/width_normal"
-        android:background="@drawable/recieverchatdrawble"
-        android:id="@+id/layoutformessage">
+        android:background="@drawable/receiver_chat_drawable"
+        android:id="@+id/layoutForMessage"
+        tools:ignore="UselessParent">
 
         <TextView
             android:layout_width="wrap_content"
@@ -21,17 +23,17 @@
             android:paddingEnd="@dimen/spacing_huge"
             android:paddingBottom="@dimen/spacing_tiny"
             android:paddingTop="@dimen/spacing_tiny"
-            android:id="@+id/sendermessage">
+            android:id="@+id/senderMessage">
         </TextView>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/timeofmessage"
+            android:id="@+id/timeOfMessage"
             android:textSize="@dimen/font_small"
-            android:layout_toEndOf="@id/sendermessage"
+            android:layout_toEndOf="@id/senderMessage"
             android:layout_marginStart="-40dp"
-            android:layout_alignBottom="@id/sendermessage"
+            android:layout_alignBottom="@id/senderMessage"
             android:text="@string/_20_09"
             android:padding="@dimen/spacing_tiny"
             android:textColor="@color/darkGray" />

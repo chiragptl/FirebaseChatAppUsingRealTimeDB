@@ -25,6 +25,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class OtpAuthenticationFragment extends Fragment {
 
@@ -48,41 +52,35 @@ public class OtpAuthenticationFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_otp_authentication, container, false);
 
-        mChangeNumber = view.findViewById(R.id.changenumber);
-        mVerifyOtp = view.findViewById(R.id.verifyotp);
-        mGetOtp = view.findViewById(R.id.getotp);
-        mProgressbarOfOtpAuth = view.findViewById(R.id.progressbarofotpauth);
+        mChangeNumber = view.findViewById(R.id.changeNumber);
+        mVerifyOtp = view.findViewById(R.id.verifyOtp);
+        mGetOtp = view.findViewById(R.id.getOtp);
+        mProgressbarOfOtpAuth = view.findViewById(R.id.progressBarOfOtpAuth);
         firebaseAuth = FirebaseAuth.getInstance();
 
 
-
-        mChangeNumber.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Fragment fragment = new LoginFragment();
-                fragmentRedirect(fragment);
-            }
+        mChangeNumber.setOnClickListener(view1 -> {
+            Fragment fragment = new LoginFragment();
+            fragmentRedirect(fragment);
         });
 
-        mVerifyOtp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                enteredOtp = mGetOtp.getText().toString();
-                if (enteredOtp.isEmpty()) {
-                    Log.d("otp", "Empty");
-                } else {
-                    mProgressbarOfOtpAuth.setVisibility(View.VISIBLE);
-                    String codeReceived = getArguments().getString("code");
-                    PhoneAuthCredential credential = PhoneAuthProvider.getCredential(codeReceived, enteredOtp);
-                    signInWithCredential(credential);
-                }
+        mVerifyOtp.setOnClickListener(view12 -> {
+            enteredOtp = mGetOtp.getText().toString();
+            if (enteredOtp.isEmpty()) {
+                Log.d("otp", "Empty");
+            } else {
+                mProgressbarOfOtpAuth.setVisibility(View.VISIBLE);
+                assert getArguments() != null;
+                String codeReceived = getArguments().getString("code");
+                PhoneAuthCredential credential = PhoneAuthProvider.getCredential(codeReceived, enteredOtp);
+                signInWithCredential(credential);
             }
         });
         return view;
     }
 
-    private void fragmentRedirect(Fragment fragment){
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+    private void fragmentRedirect(Fragment fragment) {
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.replace, fragment);
         fragmentTransaction.commit();
@@ -93,30 +91,51 @@ public class OtpAuthenticationFragment extends Fragment {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Log.d("login", "Login Successfully");
-                        if(getArguments() != null) {
-                            String phoneBundle = "+91"+ getArguments().getString("number");
-                            Log.d("phone", phoneBundle + " from bundle");
-                            FirebaseUser user = firebaseAuth.getCurrentUser();
-                            if (user != null) {
-                                String number = user.getPhoneNumber();
-                                Log.d("phone", number + " from firebase user");
-                                if (phoneBundle.equalsIgnoreCase(number)) {
-                                    Fragment fragment = new DashboardFragment();
-                                    Bundle authData = loginViewModel.getAuthData();
-                                    fragment.setArguments(authData);
-                                    fragmentRedirect(fragment);
-                                }
-                            }
-                        }
-                        else {
-                            Fragment fragment = new SetProfileFragment();
-                            Bundle authData = loginViewModel.getAuthData();
-                            fragment.setArguments(authData);
-                            fragmentRedirect(fragment);
-                        }
+                        checkIsExistingUser();
                     } else {
                         Log.d("login", "Login failed");
                     }
                 });
+    }
+
+    private void checkIsExistingUser() {
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        FirebaseDatabase.getInstance().getReference().addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                Log.d("Otp", "onChildAdded: " + snapshot.getKey());
+                assert user != null;
+                if (user.getUid().equalsIgnoreCase(snapshot.getKey())) {
+                    Fragment fragment = new DashboardFragment();
+                    Bundle authData = loginViewModel.getAuthData();
+                    fragment.setArguments(authData);
+                    fragmentRedirect(fragment);
+                }
+            }
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        Fragment fragment = new SetProfileFragment();
+        Bundle authData = loginViewModel.getAuthData();
+        fragment.setArguments(authData);
+        fragmentRedirect(fragment);
     }
 }

@@ -15,11 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.chatappfirebase.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ChatFragment extends Fragment {
 
@@ -50,34 +48,31 @@ public class ChatFragment extends Fragment {
         mRecyclerview.setLayoutManager(linearLayoutManager);
 
         firebaseChatModelArrayList = new ArrayList<>();
-        myChatAdapter = new ChatAdapter(getContext(),firebaseChatModelArrayList, getActivity().getSupportFragmentManager());
+        myChatAdapter = new ChatAdapter(firebaseChatModelArrayList, requireActivity().getSupportFragmentManager());
 
         mRecyclerview.setAdapter(myChatAdapter);
         eventChangeListener();
-        Log.d("currentUser",firebaseAuth.getCurrentUser().getUid());
+        Log.d("currentUser", Objects.requireNonNull(firebaseAuth.getCurrentUser()).getUid());
         Log.d("chatFragment","onCreateView");
         return view;
     }
 
     private void eventChangeListener() {
-        firebaseFirestore.collection("Users").whereNotEqualTo("uid",firebaseAuth.getCurrentUser().getUid())
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        if(error!= null)
-                        {
-                            Log.e("Firestore Error", error.getLocalizedMessage());
-                            return;
-                        }
-                        for (DocumentChange documentChange: value.getDocumentChanges()){
-                            FirebaseChatModel firebaseChat = documentChange.getDocument().toObject(FirebaseChatModel.class);
-                            if (!firebaseChatModelArrayList.contains(firebaseChat)) {
-                                firebaseChatModelArrayList.add(firebaseChat);
-                            }
-                        }
-                        myChatAdapter.notifyItemRangeInserted(myChatAdapter.getItemCount(),firebaseChatModelArrayList.size());
-//                        myChatAdapter.notifyDataSetChanged();
+        firebaseFirestore.collection("Users").whereNotEqualTo("uid", Objects.requireNonNull(firebaseAuth.getCurrentUser()).getUid())
+                .addSnapshotListener((value, error) -> {
+                    if(error!= null)
+                    {
+                        Log.e("Firestore Error", error.getLocalizedMessage());
+                        return;
                     }
+                    assert value != null;
+                    for (DocumentChange documentChange: value.getDocumentChanges()){
+                        FirebaseChatModel firebaseChat = documentChange.getDocument().toObject(FirebaseChatModel.class);
+                        if (!firebaseChatModelArrayList.contains(firebaseChat)) {
+                            firebaseChatModelArrayList.add(firebaseChat);
+                        }
+                    }
+                    myChatAdapter.notifyItemRangeInserted(myChatAdapter.getItemCount(),firebaseChatModelArrayList.size());
                 });
     }
 }

@@ -16,7 +16,7 @@
         android:contentDescription="@string/app_name">
     </ImageView>
     <TextView
-        android:id="@+id/textheading"
+        android:id="@+id/textHeading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/logo"
@@ -28,7 +28,7 @@
         android:textStyle="bold">
     </TextView>
     <RelativeLayout
-        android:id="@+id/centerhorizontalline"
+        android:id="@+id/centerHorizontalLine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true">
@@ -37,7 +37,7 @@
         android:id="@+id/phone"
         android:layout_width="match_parent"
         android:layout_height="@dimen/width_normal"
-        android:layout_below="@id/centerhorizontalline"
+        android:layout_below="@id/centerHorizontalLine"
         android:layout_marginLeft="70dp"
         android:layout_marginTop="@dimen/spacing_small"
         android:layout_marginRight="70dp"

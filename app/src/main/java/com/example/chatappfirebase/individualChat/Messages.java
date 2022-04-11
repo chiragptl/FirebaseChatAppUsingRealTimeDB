@@ -1,4 +1,4 @@
-package com.example.chatappfirebase.IndividualChat;
+package com.example.chatappfirebase.individualChat;
 
 public class Messages {
 

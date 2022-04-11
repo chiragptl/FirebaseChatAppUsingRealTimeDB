@@ -58,7 +58,7 @@ public class LoginFragment extends Fragment {
                 String number = phone.getText().toString();
                 bar.setVisibility(View.VISIBLE);
                 Log.d("phone",number + " from user input");
-                loginViewModel.authenticateNumber("null", number, getActivity());
+                loginViewModel.authenticateNumber(number, getActivity());
                 bar.setVisibility(View.INVISIBLE);
                 Fragment fragment = new OtpAuthenticationFragment();
                 Bundle authData = loginViewModel.getAuthData();
@@ -70,7 +70,7 @@ public class LoginFragment extends Fragment {
     }
 
     private void redirectToFragment(Fragment fragment){
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.replace, fragment);
         fragmentTransaction.commit();

@@ -11,9 +11,9 @@
     <string name="status_displays_here">Status Displays here</string>
     <string name="chats">Chats</string>
     <string name="enterNumber">Enter Your Number Here</string>
-    <string name="enterOtp">Enter The OTP Which You Recieved</string>
+    <string name="enterOtp">Enter The OTP Which You Received</string>
     <string name="enterOTP">Enter the OTP here....</string>
-    <string name="changeNumber">Didn\'t Recieve ? Change Your Number</string>
+    <string name="changeNumber">Not Receive ? Change Your Number</string>
     <string name="verifyOtpBtn">Verify OTP</string>
     <string name="save_your_profile">Save Your Profile</string>
     <string name="enterName">Enter Your Name Here</string>

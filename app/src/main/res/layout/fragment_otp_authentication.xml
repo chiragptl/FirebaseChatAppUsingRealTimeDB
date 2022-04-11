@@ -13,7 +13,7 @@
         android:contentDescription="@string/app_name">
     </ImageView>
     <TextView
-        android:id="@+id/textheading"
+        android:id="@+id/textHeading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/logo"
@@ -25,10 +25,10 @@
         android:textStyle="bold">
     </TextView>
     <EditText
-        android:id="@+id/getotp"
+        android:id="@+id/getOtp"
         android:layout_width="@dimen/width_taller"
         android:layout_height="@dimen/width_normal"
-        android:layout_below="@id/textheading"
+        android:layout_below="@id/textHeading"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="@dimen/width_tall"
         android:layout_marginRight="@dimen/width_tall"
@@ -38,10 +38,10 @@
         android:textColor="@color/black">
     </EditText>
     <TextView
-        android:id="@+id/changenumber"
+        android:id="@+id/changeNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/getotp"
+        android:layout_below="@id/getOtp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
         android:text="@string/changeNumber"
@@ -49,10 +49,10 @@
         android:textSize="@dimen/font_normal">
     </TextView>
     <android.widget.Button
-        android:id="@+id/verifyotp"
+        android:id="@+id/verifyOtp"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/height_normal"
-        android:layout_below="@id/changenumber"
+        android:layout_below="@id/changeNumber"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
         android:background="@color/green"
@@ -62,10 +62,10 @@
         android:textColor="@color/white">
     </android.widget.Button>
     <ProgressBar
-        android:id="@+id/progressbarofotpauth"
+        android:id="@+id/progressBarOfOtpAuth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/verifyotp"
+        android:layout_below="@id/verifyOtp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
         android:visibility="invisible">

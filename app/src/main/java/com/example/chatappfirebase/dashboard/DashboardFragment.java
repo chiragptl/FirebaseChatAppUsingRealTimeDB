@@ -17,11 +17,10 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.chatappfirebase.R;
 import com.example.chatappfirebase.login.LoginFragment;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,8 +31,8 @@ public class DashboardFragment extends Fragment {
 
     TabLayout tabLayout;
     TabItem mChat;
-    ViewPager viewPager;
-    PagerAdapter pagerAdapter;
+    ViewPager2 viewPager;
+    UserListAdapter userListAdapter;
     androidx.appcompat.widget.Toolbar mToolBar;
     FirebaseAuth firebaseAuth;
     FirebaseFirestore firebaseFirestore;
@@ -52,19 +51,19 @@ public class DashboardFragment extends Fragment {
 
         tabLayout = view.findViewById(R.id.include);
         mChat = view.findViewById(R.id.chat);
-        viewPager = view.findViewById(R.id.fragmentcontainer);
+        viewPager = view.findViewById(R.id.fragmentContainer);
 
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
 
         mToolBar =view.findViewById(R.id.toolbar);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(mToolBar);
+        ((AppCompatActivity) requireActivity()).setSupportActionBar(mToolBar);
 
-        Drawable drawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_more_vert_24);
+        Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_more_vert_24);
         mToolBar.setOverflowIcon(drawable);
 
-        pagerAdapter = new PagerAdapter(getChildFragmentManager());//getActivity().getSupportFragmentManager()
-        viewPager.setAdapter(pagerAdapter);
+        userListAdapter = new UserListAdapter(getChildFragmentManager(), getLifecycle());
+        viewPager.setAdapter(userListAdapter);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -72,7 +71,7 @@ public class DashboardFragment extends Fragment {
                 viewPager.setCurrentItem(tab.getPosition());
                 if (tab.getPosition() == 0 || tab.getPosition() == 1) {
                     Log.d("tab", "setOnTabSelectedListener" + tab.getPosition());
-                    pagerAdapter.notifyDataSetChanged();
+                    userListAdapter.notifyItemChanged(tab.getPosition());
                 }
             }
 
@@ -86,13 +85,14 @@ public class DashboardFragment extends Fragment {
 
             }
         });
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+        viewPager.addStatesFromChildren();
         return view;
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        MenuInflater menuInflater = getActivity().getMenuInflater();
+        MenuInflater menuInflater = requireActivity().getMenuInflater();
         menuInflater.inflate(R.menu.menu, menu);
     }
 
@@ -111,26 +111,17 @@ public class DashboardFragment extends Fragment {
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
         firebaseAuth = FirebaseAuth.getInstance();
         String uid = firebaseAuth.getUid();
+        assert uid != null;
         DocumentReference documentReference = firebaseFirestore.collection("Users").document(uid);
-        documentReference.update("status", "Online").addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d("status", "Now User is Online");
-            }
-        });
+        documentReference.update("status", "Online").addOnSuccessListener(aVoid -> Log.d("status", "Now User is Online"));
     }
 
     private void redirectToFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.replace, fragment);
         fragmentTransaction.commit();

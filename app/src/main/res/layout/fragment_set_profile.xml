@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/getuserimage"
+        android:layout_above="@+id/getUserImage"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="@dimen/height_short"
         android:text="@string/save_your_profile"
@@ -20,27 +20,27 @@
 
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/getuserimage"
+        android:id="@+id/getUserImage"
         android:layout_width="@dimen/width_tall"
         android:layout_height="@dimen/width_tall"
-        android:layout_above="@+id/getusername"
+        android:layout_above="@+id/getUserName"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="@dimen/spacing_max"
         android:layout_marginBottom="@dimen/spacing_large"
         app:cardCornerRadius="@dimen/width_tall">
 
         <ImageView
-            android:id="@+id/getuserimageinimageview"
+            android:id="@+id/getUserImageInImageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:src="@drawable/defaultprofile"
+            android:src="@drawable/default_profile"
             android:contentDescription="@string/app_name">
         </ImageView>
 
     </androidx.cardview.widget.CardView>
     <EditText
-        android:id="@+id/getusername"
+        android:id="@+id/getUserName"
         android:layout_width="match_parent"
         android:layout_height="@dimen/width_normal"
         android:layout_centerInParent="true"
@@ -53,7 +53,7 @@
         android:id="@+id/saveProfile"
         android:layout_width="@dimen/width_taller"
         android:layout_height="@dimen/height_normal"
-        android:layout_below="@id/getusername"
+        android:layout_below="@id/getUserName"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/spacing_large"
         android:background="@color/green"
@@ -61,7 +61,7 @@
         android:textColor="@color/white">
     </android.widget.Button>
     <ProgressBar
-        android:id="@+id/progressbarofsetProfile"
+        android:id="@+id/progressBarOfSetProfile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/saveProfile"

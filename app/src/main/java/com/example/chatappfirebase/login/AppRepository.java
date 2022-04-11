@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,23 +15,17 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.concurrent.TimeUnit;
 
 public class AppRepository {
     private final Application application;
     private final FirebaseAuth firebaseAuth;
-    DatabaseReference databaseReference;
     private final MutableLiveData<FirebaseUser> firebaseUserMutableLiveData;
     private final MutableLiveData<Boolean> logoutMutableLiveData;
     private final MutableLiveData<Boolean> loginMutableLiveData;
-    Activity activity;
-    String verificationID;
-    String phoneNumber;
-    String name;
-    Bundle authData;
+    String verificationID, phoneNumber;
+    private final Bundle authData;
 
     public AppRepository(Application application) {
         this.application = application;
@@ -41,13 +33,10 @@ public class AppRepository {
         logoutMutableLiveData = new MutableLiveData<>();
         loginMutableLiveData = new MutableLiveData<>();
         firebaseAuth = FirebaseAuth.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://mvvmchatapp-76ac2-default-rtdb.firebaseio.com/");
         authData = new Bundle();
     }
 
-    public void authenticateNumber(String name, String phoneNumber, Activity activity) {
-        this.activity = activity;
-        this.name = name;
+    public void authenticateNumber(String phoneNumber, Activity activity) {
         this.phoneNumber = phoneNumber;
         Log.d("phone", this.phoneNumber + " from authenticateNumber");
         Log.d("getClass",application.getClass().toString());
@@ -68,7 +57,7 @@ public class AppRepository {
             final String code = credential.getSmsCode();
             if(code!=null)
             {
-                authenticateNumberManually(code);
+//                authenticateNumberManually(code);
                 Log.d("autoLogin","AutoLogin");
             }
         }
