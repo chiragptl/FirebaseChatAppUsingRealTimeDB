@@ -60,16 +60,5 @@
         android:text="@string/saveProfile"
         android:textColor="@color/white">
     </android.widget.Button>
-    <ProgressBar
-        android:id="@+id/progressBarOfSetProfile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/saveProfile"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:visibility="invisible">
-
-    </ProgressBar>
-
 
 </RelativeLayout>

@@ -83,6 +83,7 @@ public class OtpAuthenticationFragment extends Fragment {
         FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.replace, fragment);
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
@@ -132,7 +133,6 @@ public class OtpAuthenticationFragment extends Fragment {
 
             }
         });
-
         Fragment fragment = new SetProfileFragment();
         Bundle authData = loginViewModel.getAuthData();
         fragment.setArguments(authData);

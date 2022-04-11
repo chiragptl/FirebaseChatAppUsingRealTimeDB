@@ -53,6 +53,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
             individualChatData.putString("status",chatModel.getName());
             fragment.setArguments(individualChatData);
             fragmentTransaction.replace(R.id.replace, fragment);
+            fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         });
     }

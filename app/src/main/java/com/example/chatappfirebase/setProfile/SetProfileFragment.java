@@ -7,8 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.ActivityResultRegistry;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -40,8 +38,6 @@ public class SetProfileFragment extends Fragment {
     private FirebaseAuth firebaseAuth;
     private String name;
     private FirebaseFirestore firebaseFirestore;
-    ProgressBar mProgressbarOfSetProfile;
-
     private MyLifecycleObserver mObserver;
 
     @Override
@@ -64,7 +60,6 @@ public class SetProfileFragment extends Fragment {
         CardView mGetUserImage = view.findViewById(R.id.getUserImage);
         mGetUserImageInImageView = view.findViewById(R.id.getUserImageInImageView);
         android.widget.Button mSaveProfile = view.findViewById(R.id.saveProfile);
-        mProgressbarOfSetProfile = view.findViewById(R.id.progressBarOfSetProfile);
 
         mGetUserImage.setOnClickListener(view1 -> mObserver.selectImage());
 
@@ -73,9 +68,7 @@ public class SetProfileFragment extends Fragment {
             if (name.isEmpty()) {
                 Log.d("empty", "Name is Empty");
             } else {
-                mProgressbarOfSetProfile.setVisibility(View.VISIBLE);
                 sendDataToRealTimeDatabase();
-                mProgressbarOfSetProfile.setVisibility(View.INVISIBLE);
                 Log.d("working", "now work on chatActivity");
                 Fragment fragment = new DashboardFragment();
                 fragmentRedirect(fragment);
@@ -111,10 +104,15 @@ public class SetProfileFragment extends Fragment {
     }
 
     private void fragmentRedirect(Fragment fragment) {
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.replace, fragment);
-        fragmentTransaction.commit();
+        try {
+            FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.replace, fragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }catch (Exception e){
+            Log.d("fragment", "fragmentRedirect: "+e.getLocalizedMessage());
+        }
     }
 
 
