@@ -1,5 +1,7 @@
 package com.example.chatappfirebase.chat;
 
+import static com.example.chatappfirebase.util.FragmentRedirect.redirectToFragment;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +12,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chatappfirebase.individualChat.IndividualChatFragment;
@@ -45,16 +46,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
         holder.statusOfUser.setText(chatModel.getStatus());
         holder.itemView.setOnClickListener(view -> {
             Fragment fragment = new IndividualChatFragment();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             Bundle individualChatData = new Bundle();
-            individualChatData.putString("name",chatModel.getName());
-            individualChatData.putString("receiverUid",chatModel.getUid());
-            individualChatData.putString("imageUri",chatModel.getImage());
-            individualChatData.putString("status",chatModel.getName());
+            individualChatData.putString("name", chatModel.getName());
+            individualChatData.putString("receiverUid", chatModel.getUid());
+            individualChatData.putString("imageUri", chatModel.getImage());
+            individualChatData.putString("status", chatModel.getName());
             fragment.setArguments(individualChatData);
-            fragmentTransaction.replace(R.id.replace, fragment);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
+            redirectToFragment(fragmentManager, fragment);
         });
     }
 
@@ -63,8 +61,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
         return firebaseChatModels.size();
     }
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder
-    {
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView particularUserName;
         private final TextView statusOfUser;
@@ -72,9 +69,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            particularUserName =itemView.findViewById(R.id.nameOfUser);
-            statusOfUser =itemView.findViewById(R.id.statusOfUser);
-            mImageViewOfUser =itemView.findViewById(R.id.imageViewOfUser);
+            particularUserName = itemView.findViewById(R.id.nameOfUser);
+            statusOfUser = itemView.findViewById(R.id.statusOfUser);
+            mImageViewOfUser = itemView.findViewById(R.id.imageViewOfUser);
         }
     }
 

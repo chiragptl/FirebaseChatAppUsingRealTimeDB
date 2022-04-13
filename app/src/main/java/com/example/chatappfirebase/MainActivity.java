@@ -1,9 +1,9 @@
 package com.example.chatappfirebase;
 
+import static com.example.chatappfirebase.util.FragmentRedirect.redirectToFragment;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         Fragment fragment = new LoginFragment();
-        FragmentRedirect(fragment);
+        redirectToFragment(getSupportFragmentManager(),fragment);
     }
 
     @Override
@@ -37,15 +37,8 @@ public class MainActivity extends AppCompatActivity {
             String number = user.getPhoneNumber();
             Log.d("phone",number +" from firebase user on resume");
             Fragment fragment = new DashboardFragment();
-            FragmentRedirect(fragment);
+            redirectToFragment(getSupportFragmentManager(), fragment);
         }
     }
 
-    private void FragmentRedirect(Fragment fragment){
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.replace, fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-    }
 }

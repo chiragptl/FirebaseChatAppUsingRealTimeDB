@@ -1,5 +1,7 @@
 package com.example.chatappfirebase.setProfile;
 
+import static com.example.chatappfirebase.util.FragmentRedirect.redirectToFragment;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -7,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.ActivityResultRegistry;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -14,8 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 
@@ -71,7 +72,7 @@ public class SetProfileFragment extends Fragment {
                 sendDataToRealTimeDatabase();
                 Log.d("working", "now work on chatActivity");
                 Fragment fragment = new DashboardFragment();
-                fragmentRedirect(fragment);
+                redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
             }
         });
         return view;
@@ -102,19 +103,6 @@ public class SetProfileFragment extends Fragment {
 
         documentReference.set(userdata).addOnSuccessListener(aVoid -> Log.d("success", "Data on Cloud Firestore send success"));
     }
-
-    private void fragmentRedirect(Fragment fragment) {
-        try {
-            FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.replace, fragment);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
-        }catch (Exception e){
-            Log.d("fragment", "fragmentRedirect: "+e.getLocalizedMessage());
-        }
-    }
-
 
     class MyLifecycleObserver implements DefaultLifecycleObserver {
         private final ActivityResultRegistry mRegistry;

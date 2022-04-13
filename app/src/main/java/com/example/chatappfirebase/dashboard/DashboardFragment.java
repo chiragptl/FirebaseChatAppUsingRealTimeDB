@@ -1,5 +1,7 @@
 package com.example.chatappfirebase.dashboard;
 
+import static com.example.chatappfirebase.util.FragmentRedirect.redirectToFragment;
+
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,8 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.chatappfirebase.R;
@@ -56,7 +56,7 @@ public class DashboardFragment extends Fragment {
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
 
-        mToolBar =view.findViewById(R.id.toolbar);
+        mToolBar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(mToolBar);
 
         Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_more_vert_24);
@@ -105,7 +105,7 @@ public class DashboardFragment extends Fragment {
             Bundle bundle = new Bundle();
             bundle.putBoolean("logout", true);
             fragment.setArguments(bundle);
-            redirectToFragment(fragment);
+            redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
         }
         return true;
     }
@@ -118,13 +118,5 @@ public class DashboardFragment extends Fragment {
         assert uid != null;
         DocumentReference documentReference = firebaseFirestore.collection("Users").document(uid);
         documentReference.update("status", "Online").addOnSuccessListener(aVoid -> Log.d("status", "Now User is Online"));
-    }
-
-    private void redirectToFragment(Fragment fragment) {
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.replace, fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
     }
 }

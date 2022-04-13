@@ -1,5 +1,7 @@
 package com.example.chatappfirebase.individualChat;
 
+import static com.example.chatappfirebase.util.FragmentRedirect.redirectToFragment;
+
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,8 +19,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -166,7 +166,7 @@ public class IndividualChatFragment extends Fragment {
 
         mBackButtonOfSpecificChat.setOnClickListener(view13 -> {
             Fragment fragment = new DashboardFragment();
-            redirectToFragment(fragment);
+            redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
         });
 
         mNameOfSpecificUser.setText(mReceiverName);
@@ -205,8 +205,7 @@ public class IndividualChatFragment extends Fragment {
             long msgTimestamp = mArrayList.get(i).getTimestamp();//msg.getTimestamp();
             Log.d("index", "findIndex: " + i);
             index++;
-            if (msgTimestamp == timeStamp && msgSenderId.equalsIgnoreCase(senderId))
-            {
+            if (msgTimestamp == timeStamp && msgSenderId.equalsIgnoreCase(senderId)) {
                 Log.d("findIndex", "find Index at:" + index);
                 return index;
             }
@@ -223,7 +222,7 @@ public class IndividualChatFragment extends Fragment {
             if (keyEvent.getAction() == KeyEvent.ACTION_UP && i == KeyEvent.KEYCODE_BACK) {
                 Log.d("Back Button", "back button pressed");
                 Fragment fragment = new DashboardFragment();
-                redirectToFragment(fragment);
+                redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
                 return true;
             }
             return false;
@@ -234,14 +233,7 @@ public class IndividualChatFragment extends Fragment {
     public void onPause() {
         super.onPause();
         Fragment fragment = new DashboardFragment();
-        redirectToFragment(fragment);
+        redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
     }
 
-    private void redirectToFragment(Fragment fragment) {
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.replace, fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-    }
 }

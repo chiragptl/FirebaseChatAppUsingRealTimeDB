@@ -1,5 +1,7 @@
 package com.example.chatappfirebase.otpAuthentication;
 
+import static com.example.chatappfirebase.util.FragmentRedirect.redirectToFragment;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,8 +14,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.chatappfirebase.R;
@@ -61,7 +61,8 @@ public class OtpAuthenticationFragment extends Fragment {
 
         mChangeNumber.setOnClickListener(view1 -> {
             Fragment fragment = new LoginFragment();
-            fragmentRedirect(fragment);
+            redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
+//            fragmentRedirect(fragment);
         });
 
         mVerifyOtp.setOnClickListener(view12 -> {
@@ -77,14 +78,6 @@ public class OtpAuthenticationFragment extends Fragment {
             }
         });
         return view;
-    }
-
-    private void fragmentRedirect(Fragment fragment) {
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.replace, fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
     }
 
     private void signInWithCredential(PhoneAuthCredential credential) {
@@ -110,7 +103,8 @@ public class OtpAuthenticationFragment extends Fragment {
                     Fragment fragment = new DashboardFragment();
                     Bundle authData = loginViewModel.getAuthData();
                     fragment.setArguments(authData);
-                    fragmentRedirect(fragment);
+                    redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
+//                    fragmentRedirect(fragment);
                 }
             }
             @Override
@@ -136,6 +130,7 @@ public class OtpAuthenticationFragment extends Fragment {
         Fragment fragment = new SetProfileFragment();
         Bundle authData = loginViewModel.getAuthData();
         fragment.setArguments(authData);
-        fragmentRedirect(fragment);
+        redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
+//        fragmentRedirect(fragment);
     }
 }

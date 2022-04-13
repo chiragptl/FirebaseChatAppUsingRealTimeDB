@@ -1,5 +1,7 @@
 package com.example.chatappfirebase.login;
 
+import static com.example.chatappfirebase.util.FragmentRedirect.redirectToFragment;
+
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -14,8 +16,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.chatappfirebase.R;
 import com.example.chatappfirebase.otpAuthentication.OtpAuthenticationFragment;
@@ -63,19 +63,13 @@ public class LoginFragment extends Fragment {
                 Fragment fragment = new OtpAuthenticationFragment();
                 Bundle authData = loginViewModel.getAuthData();
                 fragment.setArguments(authData);
-                redirectToFragment(fragment);
+                redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
+//                redirectToFragment(fragment);
             }
         });
         return view;
     }
 
-    private void redirectToFragment(Fragment fragment){
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.replace, fragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-    }
     @Override
     public void onStart() {
         super.onStart();
