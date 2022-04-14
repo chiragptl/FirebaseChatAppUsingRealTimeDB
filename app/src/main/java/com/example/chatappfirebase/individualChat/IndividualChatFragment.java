@@ -1,5 +1,7 @@
 package com.example.chatappfirebase.individualChat;
 
+import static com.example.chatappfirebase.util.Constants.NAME;
+import static com.example.chatappfirebase.util.Constants.RECEIVER_UID;
 import static com.example.chatappfirebase.util.FragmentRedirect.redirectToFragment;
 
 import android.app.ProgressDialog;
@@ -19,6 +21,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -50,24 +54,26 @@ public class IndividualChatFragment extends Fragment {
 
     private String enteredMessage;
     String mReceiverName, mReceiverUid, mSenderUid;
-    private FirebaseAuth firebaseAuth;
-    FirebaseDatabase firebaseDatabase;
     String senderReceiver, receiverSender;
 
     ImageButton mBackButtonOfSpecificChat;
 
     RecyclerView mMessageRecyclerView;
 
-    String currentTime;
     Calendar calendar;
     SimpleDateFormat simpleDateFormat;
 
     IndividualChatMessageAdapter messagesAdapter;
     ProgressDialog progressBar;
 
+    private IndividualChatViewModel viewModel;
+    private FirebaseAuth firebaseAuth;
+    FirebaseDatabase firebaseDatabase;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        viewModel = new ViewModelProvider(requireActivity()).get(IndividualChatViewModel.class);
     }
 
     @Nullable
@@ -95,6 +101,9 @@ public class IndividualChatFragment extends Fragment {
         mMessageRecyclerView.setLayoutManager(linearLayoutManager);
 
         messagesAdapter = new IndividualChatMessageAdapter(getContext());
+
+        viewModel.getMessage().observe(requireActivity(),messagesObserver);
+        viewModel.getEditedMessage().observe(requireActivity(),messagesUpdateObserver);
         mMessageRecyclerView.setAdapter(messagesAdapter);
 
 
@@ -103,66 +112,20 @@ public class IndividualChatFragment extends Fragment {
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance();
+
         calendar = Calendar.getInstance();
-        simpleDateFormat = (SimpleDateFormat) DateFormat.getDateInstance();//new SimpleDateFormat("hh:mm a");
+        simpleDateFormat = new SimpleDateFormat("hh:mm a");
 
         mSenderUid = firebaseAuth.getUid();
         Bundle bundleData = getArguments();
-        mReceiverUid = Objects.requireNonNull(bundleData).getString("receiverUid");
-        mReceiverName = bundleData.getString("name");
+        mReceiverUid = Objects.requireNonNull(bundleData).getString(RECEIVER_UID);
+        mReceiverName = bundleData.getString(NAME);
         senderReceiver = mSenderUid + mReceiverUid;
         receiverSender = mReceiverUid + mSenderUid;
 
-        DatabaseReference databaseReference = firebaseDatabase.getReference().child("chats").child(senderReceiver).child("messages");
 
-        databaseReference.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                Log.d("snapshot", "Message timestamp: " + Objects.requireNonNull(snapshot.getValue(Messages.class)).getTimestamp());
-                messagesAdapter.add(snapshot.getValue(Messages.class));
-                if (progressBar.isShowing()) {
-                    Log.d("ProgressBar", "dismiss");
-                    progressBar.dismiss();
-                }
-                Log.d("ADAPTER", "ON DATA CHANGE");
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                Messages messages = snapshot.getValue(Messages.class);
-
-                String senderId = Objects.requireNonNull(messages).getSenderId();
-                long timeStamp = messages.getTimestamp();
-
-                Log.d("change", messages.getMessage() + " " + previousChildName);
-
-                int index = findIndex(senderId, timeStamp);
-
-                Log.d("onChildChanged", "onChildChanged: index " + index);
-                messagesAdapter.update(messages, index);
-
-                Log.d("message", messages.getMessage() + " " + messages.getSenderId());
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-        if (progressBar.isShowing()) {
-            Log.d("ProgressBar", "dismiss");
-            progressBar.dismiss();
-        }
+        viewModel.LoadChat(senderReceiver);
+        progressBar.dismiss();
 
         mBackButtonOfSpecificChat.setOnClickListener(view13 -> {
             Fragment fragment = new DashboardFragment();
@@ -171,47 +134,34 @@ public class IndividualChatFragment extends Fragment {
 
         mNameOfSpecificUser.setText(mReceiverName);
         Picasso.get().load(R.drawable.default_profile).into(mImageviewOfSpecificUser);
+
         mSendMessageButton.setOnClickListener(view12 -> {
             enteredMessage = mGetMessage.getText().toString();
             if (enteredMessage.isEmpty()) {
                 Log.d("message", "Enter message first");
             } else {
-                Date date = new Date();
-                currentTime = simpleDateFormat.format(calendar.getTime());
-                Messages messages = new Messages(enteredMessage, firebaseAuth.getUid(), date.getTime(), currentTime);
-                firebaseDatabase = FirebaseDatabase.getInstance();
-                firebaseDatabase.getReference().child("chats")
-                        .child(senderReceiver)
-                        .child("messages")
-                        .push().setValue(messages).addOnCompleteListener(task -> firebaseDatabase.getReference()
-                        .child("chats")
-                        .child(receiverSender)
-                        .child("messages")
-                        .push()
-                        .setValue(messages).addOnCompleteListener(task1 -> {
 
-                        }));
+                viewModel.sendMessage(enteredMessage, senderReceiver, receiverSender);
                 mGetMessage.setText(null);
             }
         });
         return view;
     }
 
-    public int findIndex(String senderId, long timeStamp) {
-        ArrayList<Messages> mArrayList = messagesAdapter.getMessagesArrayList();
-        int index = -1;
-        for (int i = 0; i < mArrayList.size(); i++) {
-            String msgSenderId = mArrayList.get(i).getSenderId();//msg.getSenderId();
-            long msgTimestamp = mArrayList.get(i).getTimestamp();//msg.getTimestamp();
-            Log.d("index", "findIndex: " + i);
-            index++;
-            if (msgTimestamp == timeStamp && msgSenderId.equalsIgnoreCase(senderId)) {
-                Log.d("findIndex", "find Index at:" + index);
-                return index;
-            }
+    Observer<ArrayList<Messages>> messagesObserver = new Observer<ArrayList<Messages>>() {
+        @Override
+        public void onChanged(ArrayList<Messages> messages) {
+            messagesAdapter.addAll(messages);
         }
-        return index;
-    }
+    };
+
+    Observer<Messages> messagesUpdateObserver = new Observer<Messages>() {
+        @Override
+        public void onChanged(Messages messages) {
+            int index = messagesAdapter.findIndex(messages.getSenderId(),messages.getTimestamp());
+            messagesAdapter.update(messages, index);
+        }
+    };
 
     @Override
     public void onResume() {

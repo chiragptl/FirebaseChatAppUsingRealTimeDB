@@ -19,10 +19,6 @@ import java.util.Objects;
 public class IndividualChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     final Context context;
 
-    public ArrayList<Messages> getMessagesArrayList() {
-        return messagesArrayList;
-    }
-
     final ArrayList<Messages> messagesArrayList = new ArrayList<>();
 
     final int ITEM_SEND = 1;
@@ -32,6 +28,12 @@ public class IndividualChatMessageAdapter extends RecyclerView.Adapter<RecyclerV
         messagesArrayList.add(addMessage);
         Log.d("add", "add: single value");
         notifyItemInserted(messagesArrayList.size());
+    }
+
+    public void addAll(ArrayList<Messages> addAllMessage) {
+        this.messagesArrayList.addAll(addAllMessage);
+        Log.d("add", "add: all value");
+        notifyItemRangeInserted(getItemCount(), addAllMessage.size());
     }
 
     public void update(Messages messages, int index) {
@@ -90,25 +92,44 @@ public class IndividualChatMessageAdapter extends RecyclerView.Adapter<RecyclerV
     }
 
     static class SenderViewHolder extends RecyclerView.ViewHolder {
+
         final TextView textViewMessage;
         final TextView timeOfMessage;
-
         public SenderViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewMessage = itemView.findViewById(R.id.senderMessage);
             timeOfMessage = itemView.findViewById(R.id.timeOfMessage);
         }
-    }
 
+    }
     static class ReceiverViewHolder extends RecyclerView.ViewHolder {
+
         final TextView textViewMessage;
         final TextView timeOfMessage;
-
         public ReceiverViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewMessage = itemView.findViewById(R.id.senderMessage);
             timeOfMessage = itemView.findViewById(R.id.timeOfMessage);
         }
+
+    }
+    public ArrayList<Messages> getMessagesArrayList() {
+        return messagesArrayList;
     }
 
+    public int findIndex(String senderId, long timeStamp) {
+        ArrayList<Messages> mArrayList = getMessagesArrayList();
+        int index = -1;
+        for (int i = 0; i < mArrayList.size(); i++) {
+            String msgSenderId = mArrayList.get(i).getSenderId();//msg.getSenderId();
+            long msgTimestamp = mArrayList.get(i).getTimestamp();//msg.getTimestamp();
+            Log.d("index", "findIndex: " + i);
+            index++;
+            if (msgTimestamp == timeStamp && msgSenderId.equalsIgnoreCase(senderId)) {
+                Log.d("findIndex", "find Index at:" + index);
+                return index;
+            }
+        }
+        return index;
+    }
 }
