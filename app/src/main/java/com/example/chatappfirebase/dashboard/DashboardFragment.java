@@ -36,8 +36,6 @@ public class DashboardFragment extends Fragment {
     ViewPager2 viewPager;
     UserListAdapter userListAdapter;
     androidx.appcompat.widget.Toolbar mToolBar;
-    FirebaseAuth firebaseAuth;
-    FirebaseFirestore firebaseFirestore;
     private LoginViewModel loginViewModel;
 
 
@@ -56,9 +54,6 @@ public class DashboardFragment extends Fragment {
         tabLayout = view.findViewById(R.id.include);
         mChat = view.findViewById(R.id.chat);
         viewPager = view.findViewById(R.id.fragmentContainer);
-
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        firebaseAuth = FirebaseAuth.getInstance();
 
         mToolBar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(mToolBar);
@@ -106,9 +101,6 @@ public class DashboardFragment extends Fragment {
             Log.d("logout", "Logout");
             loginViewModel.signOut();
             Fragment fragment = new LoginFragment();
-            Bundle bundle = new Bundle();
-            bundle.putBoolean("logout", true);
-            fragment.setArguments(bundle);
             redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
         }
         return true;
@@ -117,10 +109,6 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        firebaseAuth = FirebaseAuth.getInstance();
-        String uid = firebaseAuth.getUid();
-        assert uid != null;
-        DocumentReference documentReference = firebaseFirestore.collection("Users").document(uid);
-        documentReference.update("status", "Online").addOnSuccessListener(aVoid -> Log.d("status", "Now User is Online"));
+        loginViewModel.updateUserStatus();
     }
 }

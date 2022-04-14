@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -19,6 +20,8 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.chatappfirebase.R;
 import com.example.chatappfirebase.dashboard.DashboardFragment;
@@ -36,14 +39,14 @@ public class SetProfileFragment extends Fragment {
 
     private ImageView mGetUserImageInImageView;
     private EditText mGetUserName;
-    private FirebaseAuth firebaseAuth;
     private String name;
-    private FirebaseFirestore firebaseFirestore;
     private MyLifecycleObserver mObserver;
+    private SetProfileViewModel setProfileViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setProfileViewModel = new ViewModelProvider(requireActivity()).get(SetProfileViewModel.class);
     }
 
     @Nullable
@@ -51,16 +54,13 @@ public class SetProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_set_profile, container, false);
 
-        mObserver = new MyLifecycleObserver(requireActivity().getActivityResultRegistry());
-        getLifecycle().addObserver(mObserver);
-
-        firebaseAuth = FirebaseAuth.getInstance();
-        firebaseFirestore = FirebaseFirestore.getInstance();
-
         mGetUserName = view.findViewById(R.id.getUserName);
+        Button mSaveProfile = view.findViewById(R.id.saveProfile);
         CardView mGetUserImage = view.findViewById(R.id.getUserImage);
         mGetUserImageInImageView = view.findViewById(R.id.getUserImageInImageView);
-        android.widget.Button mSaveProfile = view.findViewById(R.id.saveProfile);
+
+        mObserver = new MyLifecycleObserver(requireActivity().getActivityResultRegistry());
+        getLifecycle().addObserver(mObserver);
 
         mGetUserImage.setOnClickListener(view1 -> mObserver.selectImage());
 
@@ -69,39 +69,20 @@ public class SetProfileFragment extends Fragment {
             if (name.isEmpty()) {
                 Log.d("empty", "Name is Empty");
             } else {
-                sendDataToRealTimeDatabase();
+                setProfileViewModel.saveProfile(mGetUserName.getText().toString());
                 Log.d("working", "now work on chatActivity");
-                Fragment fragment = new DashboardFragment();
-                redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
+                setProfileViewModel.profileAdded.observe(requireActivity(), new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(Boolean aBoolean) {
+                        if (aBoolean) {
+                            Fragment fragment = new DashboardFragment();
+                            redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
+                        }
+                    }
+                });
             }
         });
         return view;
-    }
-
-    private void sendDataToRealTimeDatabase() {
-        name = mGetUserName.getText().toString().trim();
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference databaseReference = firebaseDatabase.getReference(Objects.requireNonNull(firebaseAuth.getUid()));
-        UserProfile mUserProfile = new UserProfile(name, firebaseAuth.getUid());
-        databaseReference.setValue(mUserProfile);
-        Log.d("profile added", "User Profile Added SuccessfulLy");
-        sendImageToStorage();
-    }
-
-    private void sendImageToStorage() {
-        sendDataToCloudFirestore();
-    }
-
-    private void sendDataToCloudFirestore() {
-
-        DocumentReference documentReference = firebaseFirestore.collection("Users").document(Objects.requireNonNull(firebaseAuth.getUid()));
-        Map<String, Object> userdata = new HashMap<>();
-        userdata.put("name", name);
-        userdata.put("image", "");
-        userdata.put("uid", firebaseAuth.getUid());
-        userdata.put("status", "Online");
-
-        documentReference.set(userdata).addOnSuccessListener(aVoid -> Log.d("success", "Data on Cloud Firestore send success"));
     }
 
     class MyLifecycleObserver implements DefaultLifecycleObserver {

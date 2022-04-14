@@ -24,6 +24,8 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -90,9 +92,7 @@ public class AppRepository {
             verificationID = s;
             Log.d("code","code sent");
             Toast.makeText(application, "Code sent", Toast.LENGTH_SHORT).show();
-            authData.putString("number",phoneNumber);
             authData.putString("code",verificationID);
-            authData.putBoolean("logout",false);
         }};
 
     public void authenticateNumberManually(String codeReceived, String code){
@@ -106,9 +106,9 @@ public class AppRepository {
                     if(task.isSuccessful())
                     {
                         Log.d("Login","Login Successfully");
+                        checkIsExistingUser();
                         firebaseUserMutableLiveData.postValue(firebaseAuth.getCurrentUser());
                         userLoggedMutableLiveData.postValue(true);
-                        checkIsExistingUser();
                     }
                     else{
                         Log.d("Login", "Login Successfully not "+ Objects.requireNonNull(task.getException()).getLocalizedMessage());
@@ -124,9 +124,8 @@ public class AppRepository {
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 Log.d("Otp", "onChildAdded: " + snapshot.getKey());
                 assert user != null;
-                if (user.getUid().equalsIgnoreCase(snapshot.getKey())) {
+                if (user.getUid().equalsIgnoreCase(snapshot.getKey()))
                     userFromFirebaseMutableLiveData.postValue(true);
-                }
             }
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -169,5 +168,15 @@ public class AppRepository {
 
     public MutableLiveData<Boolean> getUserFromFirebaseMutableLiveData() {
         return userFromFirebaseMutableLiveData;
+    }
+
+    public void updateUserStatus() {
+        firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+        String uid = firebaseAuth.getUid();
+        assert uid != null;
+        DocumentReference documentReference = firebaseFirestore.collection("Users").document(uid);
+        documentReference.update("status", "Online").addOnSuccessListener(aVoid -> Log.d("status", "Now User is Online"));
+
     }
 }

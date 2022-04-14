@@ -39,4 +39,9 @@ public class LoginViewModel extends AndroidViewModel {
     public void signOut(){
         appRepository.signOut();
     }
+
+    public void updateUserStatus() {
+        appRepository.updateUserStatus();
+    }
+
 }

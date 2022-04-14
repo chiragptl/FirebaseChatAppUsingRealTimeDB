@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.chatappfirebase.R;
 import com.example.chatappfirebase.otpAuthentication.OtpAuthenticationFragment;
@@ -29,13 +30,10 @@ public class LoginFragment extends Fragment {
     ProgressBar bar;
 
     private LoginViewModel loginViewModel;
-    protected FirebaseAuth firebaseAuth;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        firebaseAuth = FirebaseAuth.getInstance();
-        checkLogout();
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
     }
 
@@ -49,6 +47,14 @@ public class LoginFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         bar = view.findViewById(R.id.bar);
 
+        loginViewModel.userLoggedMutableLiveData.observe(requireActivity(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (!aBoolean){
+                    loginViewModel.signOut();
+                }
+            }
+        });
         btnGenOTP.setOnClickListener(view12 -> {
             if(TextUtils.isEmpty(phone.getText().toString()))
             {
@@ -71,24 +77,4 @@ public class LoginFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        checkLogout();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        checkLogout();
-    }
-
-    private void checkLogout(){
-        if(getArguments()!=null){
-            if(getArguments().getBoolean("logout")) {
-                firebaseAuth.signOut();
-                Log.d("signOut","user Logout");
-            }
-        }
-    }
 }
