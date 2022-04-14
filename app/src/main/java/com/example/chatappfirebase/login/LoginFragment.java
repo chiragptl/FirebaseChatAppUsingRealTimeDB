@@ -58,13 +58,14 @@ public class LoginFragment extends Fragment {
                 String number = phone.getText().toString();
                 bar.setVisibility(View.VISIBLE);
                 Log.d("phone",number + " from user input");
+
                 loginViewModel.authenticateNumber(number, getActivity());
+
                 bar.setVisibility(View.INVISIBLE);
                 Fragment fragment = new OtpAuthenticationFragment();
                 Bundle authData = loginViewModel.getAuthData();
                 fragment.setArguments(authData);
                 redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
-//                redirectToFragment(fragment);
             }
         });
         return view;

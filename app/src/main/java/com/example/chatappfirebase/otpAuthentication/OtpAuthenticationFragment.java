@@ -14,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.chatappfirebase.R;
@@ -36,15 +37,14 @@ public class OtpAuthenticationFragment extends Fragment {
     EditText mGetOtp;
     android.widget.Button mVerifyOtp;
     String enteredOtp;
-    FirebaseAuth firebaseAuth;
     ProgressBar mProgressbarOfOtpAuth;
-    private LoginViewModel loginViewModel;
+    private LoginViewModel authViewModel;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        authViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
     }
 
     @Nullable
@@ -56,13 +56,10 @@ public class OtpAuthenticationFragment extends Fragment {
         mVerifyOtp = view.findViewById(R.id.verifyOtp);
         mGetOtp = view.findViewById(R.id.getOtp);
         mProgressbarOfOtpAuth = view.findViewById(R.id.progressBarOfOtpAuth);
-        firebaseAuth = FirebaseAuth.getInstance();
-
 
         mChangeNumber.setOnClickListener(view1 -> {
             Fragment fragment = new LoginFragment();
             redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
-//            fragmentRedirect(fragment);
         });
 
         mVerifyOtp.setOnClickListener(view12 -> {
@@ -73,64 +70,74 @@ public class OtpAuthenticationFragment extends Fragment {
                 mProgressbarOfOtpAuth.setVisibility(View.VISIBLE);
                 assert getArguments() != null;
                 String codeReceived = getArguments().getString("code");
-                PhoneAuthCredential credential = PhoneAuthProvider.getCredential(codeReceived, enteredOtp);
-                signInWithCredential(credential);
-            }
-        });
+
+                authViewModel.authenticateNumberManually(codeReceived,enteredOtp);
+                authViewModel.userFromFirebaseMutableLiveData.observe(requireActivity(), new Observer<Boolean>() {
+                        @Override
+                        public void onChanged(Boolean aBoolean) {
+                            Fragment fragment;
+                            if(aBoolean){
+                                fragment = new DashboardFragment();
+                                Bundle authData = authViewModel.getAuthData();
+                                fragment.setArguments(authData);
+                            }
+                            else {
+                                fragment = new SetProfileFragment();
+                                Bundle authData = authViewModel.getAuthData();
+                                fragment.setArguments(authData);
+                            }
+                            redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
+                        }
+                    });
+                }
+            });
         return view;
     }
 
-    private void signInWithCredential(PhoneAuthCredential credential) {
-        firebaseAuth.signInWithCredential(credential)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d("login", "Login Successfully");
-                        checkIsExistingUser();
-                    } else {
-                        Log.d("login", "Login failed");
-                    }
-                });
-    }
+//    private void signInWithCredential(PhoneAuthCredential credential) {
+//        firebaseAuth.signInWithCredential(credential)
+//                .addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        Log.d("login", "Login Successfully");
+//                    } else {
+//                        Log.d("login", "Login failed");
+//                    }
+//                });
+//    }
 
-    private void checkIsExistingUser() {
-        FirebaseUser user = firebaseAuth.getCurrentUser();
-        FirebaseDatabase.getInstance().getReference().addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                Log.d("Otp", "onChildAdded: " + snapshot.getKey());
-                assert user != null;
-                if (user.getUid().equalsIgnoreCase(snapshot.getKey())) {
-                    Fragment fragment = new DashboardFragment();
-                    Bundle authData = loginViewModel.getAuthData();
-                    fragment.setArguments(authData);
-                    redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
-//                    fragmentRedirect(fragment);
-                }
-            }
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//    private void checkIsExistingUser() {
+//        FirebaseUser user = firebaseAuth.getCurrentUser();
+//        FirebaseDatabase.getInstance().getReference().addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//                Log.d("Otp", "onChildAdded: " + snapshot.getKey());
+//                assert user != null;
+//                if (user.getUid().equalsIgnoreCase(snapshot.getKey())) {
+//
+//                }
+//            }
+//            @Override
+//            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//
+//            }
+//
+//            @Override
+//            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+//
+//            }
+//
+//            @Override
+//            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+//
+////        fragmentRedirect(fragment);
+//    }
 
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-        Fragment fragment = new SetProfileFragment();
-        Bundle authData = loginViewModel.getAuthData();
-        fragment.setArguments(authData);
-        redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
-//        fragmentRedirect(fragment);
-    }
 }

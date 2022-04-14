@@ -1,5 +1,6 @@
 package com.example.chatappfirebase.login;
 
+
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
@@ -7,45 +8,60 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.chatappfirebase.dashboard.DashboardFragment;
+import com.example.chatappfirebase.setProfile.SetProfileFragment;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class AppRepository {
     private final Application application;
-    private final FirebaseAuth firebaseAuth;
+    private static FirebaseAuth firebaseAuth;
     private final MutableLiveData<FirebaseUser> firebaseUserMutableLiveData;
-    private final MutableLiveData<Boolean> logoutMutableLiveData;
-    private final MutableLiveData<Boolean> loginMutableLiveData;
-    String verificationID, phoneNumber;
+    private final MutableLiveData<Boolean> userLoggedMutableLiveData;
+    private final MutableLiveData<Boolean> userFromFirebaseMutableLiveData;
+    static String verificationID, phoneNumber;
     private final Bundle authData;
 
     public AppRepository(Application application) {
         this.application = application;
         firebaseUserMutableLiveData = new MutableLiveData<>();
-        logoutMutableLiveData = new MutableLiveData<>();
-        loginMutableLiveData = new MutableLiveData<>();
+        userLoggedMutableLiveData = new MutableLiveData<>();
+        userFromFirebaseMutableLiveData = new MutableLiveData<>();
         firebaseAuth = FirebaseAuth.getInstance();
         authData = new Bundle();
+
+        if (firebaseAuth.getCurrentUser() != null){
+            firebaseUserMutableLiveData.postValue(firebaseAuth.getCurrentUser());
+        }
     }
 
     public void authenticateNumber(String phoneNumber, Activity activity) {
-        this.phoneNumber = phoneNumber;
-        Log.d("phone", this.phoneNumber + " from authenticateNumber");
+
+        AppRepository.phoneNumber = phoneNumber;
+        Log.d("phone", AppRepository.phoneNumber + " from authenticateNumber");
         Log.d("getClass",application.getClass().toString());
+
         PhoneAuthOptions options =
                 PhoneAuthOptions.newBuilder(firebaseAuth)
-                        .setPhoneNumber("+91"+phoneNumber)  // Phone number to verify
-                        .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
-                        .setActivity(activity)                 // Activity (for callback binding)
-                        .setCallbacks(mCallbacks)          // OnVerificationStateChangedCallbacks
+                        .setPhoneNumber("+91"+phoneNumber)
+                        .setTimeout(60L, TimeUnit.SECONDS)
+                        .setActivity(activity)
+                        .setCallbacks(mCallbacks)
                         .build();
         PhoneAuthProvider.verifyPhoneNumber(options);
     }
@@ -57,7 +73,7 @@ public class AppRepository {
             final String code = credential.getSmsCode();
             if(code!=null)
             {
-//                authenticateNumberManually(code);
+                firebaseUserMutableLiveData.postValue(firebaseAuth.getCurrentUser());
                 Log.d("autoLogin","AutoLogin");
             }
         }
@@ -75,20 +91,13 @@ public class AppRepository {
             Log.d("code","code sent");
             Toast.makeText(application, "Code sent", Toast.LENGTH_SHORT).show();
             authData.putString("number",phoneNumber);
-            Log.d("phone",phoneNumber + " from after code sent");
             authData.putString("code",verificationID);
             authData.putBoolean("logout",false);
         }};
 
-    public Bundle getAuthData() {
-        return authData;
-    }
-
-    public void authenticateNumberManually(String code){
-
-        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationID, code);
+    public void authenticateNumberManually(String codeReceived, String code){
+        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(codeReceived, code);
         signInWithCredential(credential);
-        
     }
 
     private void signInWithCredential(PhoneAuthCredential credential) {
@@ -97,28 +106,68 @@ public class AppRepository {
                     if(task.isSuccessful())
                     {
                         Log.d("Login","Login Successfully");
-                        loginMutableLiveData.postValue(true);
+                        firebaseUserMutableLiveData.postValue(firebaseAuth.getCurrentUser());
+                        userLoggedMutableLiveData.postValue(true);
+                        checkIsExistingUser();
                     }
                     else{
-                        Toast.makeText(application, "Login Successfully not", Toast.LENGTH_SHORT).show();
-                        loginMutableLiveData.postValue(false);
+                        Log.d("Login", "Login Successfully not "+ Objects.requireNonNull(task.getException()).getLocalizedMessage());
                     }
                 });
     }
 
-    public MutableLiveData<Boolean> getLoginMutableLiveData() {
-        return loginMutableLiveData;
+
+    public void checkIsExistingUser() {
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        FirebaseDatabase.getInstance().getReference().addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                Log.d("Otp", "onChildAdded: " + snapshot.getKey());
+                assert user != null;
+                if (user.getUid().equalsIgnoreCase(snapshot.getKey())) {
+                    userFromFirebaseMutableLiveData.postValue(true);
+                }
+            }
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
-    public void logOut(){
-        firebaseAuth.signOut();
-        logoutMutableLiveData.postValue(true);
+    public Bundle getAuthData() {
+        return authData;
     }
+
+    public void signOut(){
+        firebaseAuth.signOut();
+        userLoggedMutableLiveData.postValue(false);
+    }
+
     public MutableLiveData<FirebaseUser> getFirebaseUserMutableLiveData() {
         return firebaseUserMutableLiveData;
     }
 
-    public MutableLiveData<Boolean> getLogoutMutableLiveData() {
-        return logoutMutableLiveData;
+    public MutableLiveData<Boolean> getUserLoggedMutableLiveData() {
+        return userLoggedMutableLiveData;
+    }
+
+    public MutableLiveData<Boolean> getUserFromFirebaseMutableLiveData() {
+        return userFromFirebaseMutableLiveData;
     }
 }
