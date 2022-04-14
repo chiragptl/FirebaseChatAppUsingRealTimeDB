@@ -17,10 +17,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.chatappfirebase.R;
 import com.example.chatappfirebase.login.LoginFragment;
+import com.example.chatappfirebase.login.LoginViewModel;
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,12 +38,14 @@ public class DashboardFragment extends Fragment {
     androidx.appcompat.widget.Toolbar mToolBar;
     FirebaseAuth firebaseAuth;
     FirebaseFirestore firebaseFirestore;
+    private LoginViewModel loginViewModel;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
     }
 
     @Nullable
@@ -98,9 +102,9 @@ public class DashboardFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
         if (item.getItemId() == R.id.logout) {
             Log.d("logout", "Logout");
+            loginViewModel.signOut();
             Fragment fragment = new LoginFragment();
             Bundle bundle = new Bundle();
             bundle.putBoolean("logout", true);

@@ -19,16 +19,17 @@ import com.example.chatappfirebase.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> {
-    final ArrayList<FirebaseChatModel> firebaseChatModels;
+    ArrayList<FirebaseChatModel> firebaseChatModels;
     final FragmentManager fragmentManager;
 
     public ChatAdapter(ArrayList<FirebaseChatModel> firebaseChatModels, FragmentManager fragmentManager) {
+        this.firebaseChatModels = new ArrayList<>();
         this.firebaseChatModels = firebaseChatModels;
         this.fragmentManager = fragmentManager;
     }
-
 
     @NonNull
     @Override
@@ -75,4 +76,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
         }
     }
 
+    public void updateUserList(final ArrayList<FirebaseChatModel> userArrayList) {
+        this.firebaseChatModels = userArrayList;
+        notifyItemRangeChanged(getItemCount(),userArrayList.size());
+    }
 }

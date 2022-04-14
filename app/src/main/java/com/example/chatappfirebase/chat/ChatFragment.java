@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,58 +23,46 @@ import java.util.Objects;
 
 public class ChatFragment extends Fragment {
 
-    private FirebaseFirestore firebaseFirestore;
-    LinearLayoutManager linearLayoutManager;
-    private FirebaseAuth firebaseAuth;
+    private ChatViewModel chatViewModel;
     ArrayList<FirebaseChatModel> firebaseChatModelArrayList;
     ChatAdapter myChatAdapter;
+
+    LinearLayoutManager linearLayoutManager;
     RecyclerView mRecyclerview;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("chatFragment","onCreate");
+        chatViewModel = new ViewModelProvider(requireActivity()).get(ChatViewModel.class);
+
+        Log.d("chatFragment", "onCreate");
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_chat,container,false);
-        firebaseAuth=FirebaseAuth.getInstance();
-        firebaseFirestore= FirebaseFirestore.getInstance();
-        mRecyclerview =view.findViewById(R.id.recyclerview);
+        View view = inflater.inflate(R.layout.fragment_chat, container, false);
 
+        mRecyclerview = view.findViewById(R.id.recyclerview);
         mRecyclerview.setHasFixedSize(true);
-        linearLayoutManager=new LinearLayoutManager(getContext());
+        linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         mRecyclerview.setLayoutManager(linearLayoutManager);
+//        firebaseChatModelArrayList = new ArrayList<>();
 
-        firebaseChatModelArrayList = new ArrayList<>();
         myChatAdapter = new ChatAdapter(firebaseChatModelArrayList, requireActivity().getSupportFragmentManager());
 
+        chatViewModel.getFirebaseChatModelArrayListMutableLiveData().observe(requireActivity(), userListUpdateObserver);
         mRecyclerview.setAdapter(myChatAdapter);
-        eventChangeListener();
-        Log.d("currentUser", Objects.requireNonNull(firebaseAuth.getCurrentUser()).getUid());
-        Log.d("chatFragment","onCreateView");
+
+        Log.d("chatFragment", "onCreateView");
         return view;
     }
+    Observer<ArrayList<FirebaseChatModel>> userListUpdateObserver = new Observer<ArrayList<FirebaseChatModel>>() {
+        @Override
+        public void onChanged(ArrayList<FirebaseChatModel> firebaseChatModels) {
+            myChatAdapter.updateUserList(firebaseChatModels);
 
-    private void eventChangeListener() {
-        firebaseFirestore.collection("Users").whereNotEqualTo("uid", Objects.requireNonNull(firebaseAuth.getCurrentUser()).getUid())
-                .addSnapshotListener((value, error) -> {
-                    if(error!= null)
-                    {
-                        Log.e("Firestore Error", error.getLocalizedMessage());
-                        return;
-                    }
-                    assert value != null;
-                    for (DocumentChange documentChange: value.getDocumentChanges()){
-                        FirebaseChatModel firebaseChat = documentChange.getDocument().toObject(FirebaseChatModel.class);
-                        if (!firebaseChatModelArrayList.contains(firebaseChat)) {
-                            firebaseChatModelArrayList.add(firebaseChat);
-                        }
-                    }
-                    myChatAdapter.notifyItemRangeInserted(myChatAdapter.getItemCount(),firebaseChatModelArrayList.size());
-                });
-    }
+        }
+    };
 }
