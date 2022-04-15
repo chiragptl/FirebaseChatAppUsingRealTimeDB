@@ -29,6 +29,7 @@ public class IndividualChatRepository {
     public MutableLiveData<Messages> editedMessage;
     public MutableLiveData<Integer> editedMessageIndex;
     public MutableLiveData<String> sentText;
+    ArrayList<Messages> messages = new ArrayList<>();
 
     public MutableLiveData<ArrayList<Messages>> getMessageList() {
         return messageList;
@@ -56,14 +57,14 @@ public class IndividualChatRepository {
     }
 
     public void LoadChat(String senderReceiver) {
-
-        ArrayList<Messages> messages = new ArrayList<>();
+        messages.clear();
         DatabaseReference databaseReference = firebaseDatabase.getReference().child("chats").child(senderReceiver).child("messages");
         databaseReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 Log.d("snapshot", "Message timestamp: " + Objects.requireNonNull(snapshot.getValue(Messages.class)).getMessage());
                 messages.add(snapshot.getValue(Messages.class));
+                messageList.postValue(messages);
             }
 
             @Override
@@ -92,7 +93,6 @@ public class IndividualChatRepository {
 
             }
         });
-        messageList.postValue(messages);
     }
 
 
@@ -112,6 +112,6 @@ public class IndividualChatRepository {
                 .push()
                 .setValue(messages).addOnCompleteListener(task1 -> {
                 }));
-        sentText.setValue(null);
+//        sentText.setValue(null);
     }
 }

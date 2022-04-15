@@ -46,34 +46,38 @@ import java.util.Objects;
 public class IndividualChatFragment extends Fragment {
     EditText mGetMessage;
     ImageButton mSendMessageButton;
-
     CardView mSendMessageCardView;
     androidx.appcompat.widget.Toolbar mToolbarOfSpecificChat;
     ImageView mImageviewOfSpecificUser;
     TextView mNameOfSpecificUser;
+    ImageButton mBackButtonOfSpecificChat;
+    RecyclerView mMessageRecyclerView;
+    ProgressDialog progressBar;
 
     private String enteredMessage;
     String mReceiverName, mReceiverUid, mSenderUid;
     String senderReceiver, receiverSender;
 
-    ImageButton mBackButtonOfSpecificChat;
-
-    RecyclerView mMessageRecyclerView;
-
-    Calendar calendar;
-    SimpleDateFormat simpleDateFormat;
-
     IndividualChatMessageAdapter messagesAdapter;
-    ProgressDialog progressBar;
 
     private IndividualChatViewModel viewModel;
     private FirebaseAuth firebaseAuth;
-    FirebaseDatabase firebaseDatabase;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(IndividualChatViewModel.class);
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        mSenderUid = firebaseAuth.getUid();
+        Bundle bundleData = getArguments();
+        mReceiverUid = Objects.requireNonNull(bundleData).getString(RECEIVER_UID);
+        mReceiverName = bundleData.getString(NAME);
+        senderReceiver = mSenderUid + mReceiverUid;
+        receiverSender = mReceiverUid + mSenderUid;
+        viewModel.LoadChat(senderReceiver);
+
     }
 
     @Nullable
@@ -110,21 +114,6 @@ public class IndividualChatFragment extends Fragment {
         ((AppCompatActivity) requireActivity()).setSupportActionBar(mToolbarOfSpecificChat);
         mToolbarOfSpecificChat.setOnClickListener(view1 -> Log.d("toolbar", "Toolbar is Clicked"));
 
-        firebaseAuth = FirebaseAuth.getInstance();
-        firebaseDatabase = FirebaseDatabase.getInstance();
-
-        calendar = Calendar.getInstance();
-        simpleDateFormat = new SimpleDateFormat("hh:mm a");
-
-        mSenderUid = firebaseAuth.getUid();
-        Bundle bundleData = getArguments();
-        mReceiverUid = Objects.requireNonNull(bundleData).getString(RECEIVER_UID);
-        mReceiverName = bundleData.getString(NAME);
-        senderReceiver = mSenderUid + mReceiverUid;
-        receiverSender = mReceiverUid + mSenderUid;
-
-
-        viewModel.LoadChat(senderReceiver);
         progressBar.dismiss();
 
         mBackButtonOfSpecificChat.setOnClickListener(view13 -> {
@@ -140,7 +129,6 @@ public class IndividualChatFragment extends Fragment {
             if (enteredMessage.isEmpty()) {
                 Log.d("message", "Enter message first");
             } else {
-
                 viewModel.sendMessage(enteredMessage, senderReceiver, receiverSender);
                 mGetMessage.setText(null);
             }

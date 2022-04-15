@@ -31,6 +31,7 @@ public class IndividualChatMessageAdapter extends RecyclerView.Adapter<RecyclerV
     }
 
     public void addAll(ArrayList<Messages> addAllMessage) {
+        messagesArrayList.clear();
         this.messagesArrayList.addAll(addAllMessage);
         Log.d("add", "add: all value");
         notifyItemRangeInserted(getItemCount(), addAllMessage.size());
