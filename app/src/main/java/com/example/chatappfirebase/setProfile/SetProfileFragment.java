@@ -20,20 +20,10 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.chatappfirebase.R;
 import com.example.chatappfirebase.dashboard.DashboardFragment;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 public class SetProfileFragment extends Fragment {
 
@@ -71,13 +61,10 @@ public class SetProfileFragment extends Fragment {
             } else {
                 setProfileViewModel.saveProfile(mGetUserName.getText().toString());
                 Log.d("working", "now work on chatActivity");
-                setProfileViewModel.profileAdded.observe(requireActivity(), new Observer<Boolean>() {
-                    @Override
-                    public void onChanged(Boolean aBoolean) {
-                        if (aBoolean) {
-                            Fragment fragment = new DashboardFragment();
-                            redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
-                        }
+                setProfileViewModel.profileAdded.observe(requireActivity(), aBoolean -> {
+                    if (aBoolean) {
+                        Fragment fragment = new DashboardFragment();
+                        redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
                     }
                 });
             }

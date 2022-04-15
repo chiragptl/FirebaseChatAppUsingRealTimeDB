@@ -20,7 +20,6 @@ public class ChatsRepository {
     private final FirebaseAuth firebaseAuth;
     public MutableLiveData<ArrayList<FirebaseChatModel>> firebaseChatModelArrayListMutableLiveData;
     ArrayList<FirebaseChatModel> chatList = new ArrayList<>();
-    public MutableLiveData<ArrayList<FirebaseChatModel>> chatArrayListMutableLiveData;
 
     public static ChatsRepository getInstance(Application application){
         if(chatsRepository == null){
@@ -55,7 +54,6 @@ public class ChatsRepository {
                         firebaseChatModelArrayListMutableLiveData.setValue(chatList);
                     }
                 });
-//        return chatList;
     }
 
 }

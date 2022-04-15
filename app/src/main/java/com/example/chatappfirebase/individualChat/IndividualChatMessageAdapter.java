@@ -24,12 +24,6 @@ public class IndividualChatMessageAdapter extends RecyclerView.Adapter<RecyclerV
     final int ITEM_SEND = 1;
     final int ITEM_RECEIVE = 2;
 
-    public void add(Messages addMessage) {
-        messagesArrayList.add(addMessage);
-        Log.d("add", "add: single value");
-        notifyItemInserted(messagesArrayList.size());
-    }
-
     public void addAll(ArrayList<Messages> addAllMessage) {
         messagesArrayList.clear();
         this.messagesArrayList.addAll(addAllMessage);

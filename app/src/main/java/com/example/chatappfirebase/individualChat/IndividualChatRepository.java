@@ -23,13 +23,14 @@ import java.util.Objects;
 public class IndividualChatRepository {
 
     private static IndividualChatRepository individualChatRepository;
-    private FirebaseAuth firebaseAuth;
+    private final FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
     public MutableLiveData<ArrayList<Messages>> messageList;
     public MutableLiveData<Messages> editedMessage;
     public MutableLiveData<Integer> editedMessageIndex;
     public MutableLiveData<String> sentText;
     ArrayList<Messages> messages = new ArrayList<>();
+
 
     public MutableLiveData<ArrayList<Messages>> getMessageList() {
         return messageList;
@@ -70,12 +71,7 @@ public class IndividualChatRepository {
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 Messages messages = snapshot.getValue(Messages.class);
-
-                Log.d("change", messages.getMessage() + " " + previousChildName);
-
                 editedMessage.setValue(messages);
-
-                Log.d("message", messages.getMessage() + " " + messages.getSenderId());
             }
 
             @Override
@@ -112,6 +108,5 @@ public class IndividualChatRepository {
                 .push()
                 .setValue(messages).addOnCompleteListener(task1 -> {
                 }));
-//        sentText.setValue(null);
     }
 }

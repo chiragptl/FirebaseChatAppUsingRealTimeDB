@@ -29,18 +29,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.chatappfirebase.R;
 import com.example.chatappfirebase.dashboard.DashboardFragment;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Objects;
 
 public class IndividualChatFragment extends Fragment {
@@ -61,7 +51,6 @@ public class IndividualChatFragment extends Fragment {
     IndividualChatMessageAdapter messagesAdapter;
 
     private IndividualChatViewModel viewModel;
-    private FirebaseAuth firebaseAuth;
 
 
     @Override
@@ -69,7 +58,7 @@ public class IndividualChatFragment extends Fragment {
         super.onCreate(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(IndividualChatViewModel.class);
 
-        firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         mSenderUid = firebaseAuth.getUid();
         Bundle bundleData = getArguments();
         mReceiverUid = Objects.requireNonNull(bundleData).getString(RECEIVER_UID);

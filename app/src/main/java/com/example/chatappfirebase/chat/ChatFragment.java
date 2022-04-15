@@ -15,11 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chatappfirebase.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class ChatFragment extends Fragment {
 
@@ -47,7 +43,6 @@ public class ChatFragment extends Fragment {
         linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(RecyclerView.VERTICAL);
         mRecyclerview.setLayoutManager(linearLayoutManager);
-//        firebaseChatModelArrayList = new ArrayList<>();
 
         myChatAdapter = new ChatAdapter(firebaseChatModelArrayList, requireActivity().getSupportFragmentManager());
 

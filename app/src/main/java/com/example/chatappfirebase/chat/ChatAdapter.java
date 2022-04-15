@@ -19,7 +19,6 @@ import com.example.chatappfirebase.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> {
     ArrayList<FirebaseChatModel> firebaseChatModels;
