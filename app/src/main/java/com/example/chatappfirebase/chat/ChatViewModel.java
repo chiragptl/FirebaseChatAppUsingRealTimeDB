@@ -12,31 +12,21 @@ import java.util.ArrayList;
 
 public class ChatViewModel extends AndroidViewModel {
 
-    private ChatsRepository repository;
+    private final ChatsRepository repository;
 
     public MutableLiveData<ArrayList<FirebaseChatModel>> firebaseChatModelArrayListMutableLiveData;
-    public ArrayList<FirebaseChatModel> firebaseChatModelArrayList;
 
     public ChatViewModel(@NonNull Application application) {
         super(application);
         repository = ChatsRepository.getInstance(application);
-        firebaseChatModelArrayListMutableLiveData = new MutableLiveData<>();
+        firebaseChatModelArrayListMutableLiveData = repository.getFirebaseChatModelArrayListMutableLiveData();
     }
-
-//    private void init() {
-//        populateList();
-//        firebaseChatModelArrayListMutableLiveData.setValue(firebaseChatModelArrayList);
-//    }
-
-//    private void populateList() {
-//        firebaseChatModelArrayList.addAll(repository.);
-//    }
 
     public MutableLiveData<ArrayList<FirebaseChatModel>> getFirebaseChatModelArrayListMutableLiveData() {
-        return repository.getFirebaseChatModelArrayListMutableLiveData();
+        return firebaseChatModelArrayListMutableLiveData;
     }
 
-//    public void eventChangeListener(){
-//        repository.eventChangeListener();
-//    }
+    public void eventChangeListener(){
+        repository.eventChangeListener();
+    }
 }

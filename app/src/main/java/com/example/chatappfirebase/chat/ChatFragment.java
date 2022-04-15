@@ -34,7 +34,6 @@ public class ChatFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         chatViewModel = new ViewModelProvider(requireActivity()).get(ChatViewModel.class);
-
         Log.d("chatFragment", "onCreate");
     }
 
@@ -53,7 +52,8 @@ public class ChatFragment extends Fragment {
         myChatAdapter = new ChatAdapter(firebaseChatModelArrayList, requireActivity().getSupportFragmentManager());
 
         chatViewModel.getFirebaseChatModelArrayListMutableLiveData().observe(requireActivity(), userListUpdateObserver);
-        mRecyclerview.setAdapter(myChatAdapter);
+
+        chatViewModel.eventChangeListener();
 
         Log.d("chatFragment", "onCreateView");
         return view;
@@ -62,6 +62,7 @@ public class ChatFragment extends Fragment {
         @Override
         public void onChanged(ArrayList<FirebaseChatModel> firebaseChatModels) {
             myChatAdapter.updateUserList(firebaseChatModels);
+            mRecyclerview.setAdapter(myChatAdapter);
 
         }
     };

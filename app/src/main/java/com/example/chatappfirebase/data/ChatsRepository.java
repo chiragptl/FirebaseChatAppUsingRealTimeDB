@@ -19,6 +19,7 @@ public class ChatsRepository {
     private final FirebaseFirestore firebaseFirestore;
     private final FirebaseAuth firebaseAuth;
     public MutableLiveData<ArrayList<FirebaseChatModel>> firebaseChatModelArrayListMutableLiveData;
+    ArrayList<FirebaseChatModel> chatList = new ArrayList<>();
     public MutableLiveData<ArrayList<FirebaseChatModel>> chatArrayListMutableLiveData;
 
     public static ChatsRepository getInstance(Application application){
@@ -31,7 +32,6 @@ public class ChatsRepository {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseChatModelArrayListMutableLiveData = new MutableLiveData<>();
-        firebaseChatModelArrayListMutableLiveData.setValue(eventChangeListener());
     }
 
     public MutableLiveData<ArrayList<FirebaseChatModel>> getFirebaseChatModelArrayListMutableLiveData() {
@@ -39,8 +39,8 @@ public class ChatsRepository {
     }
 
 
-    public ArrayList<FirebaseChatModel> eventChangeListener(){
-        ArrayList<FirebaseChatModel> chatList = new ArrayList<>();
+    public void eventChangeListener(){
+        chatList.clear();
         firebaseFirestore.collection("Users").whereNotEqualTo("uid", Objects.requireNonNull(firebaseAuth.getCurrentUser()).getUid())
                 .addSnapshotListener((value, error) -> {
                     if(error!= null)
@@ -52,9 +52,10 @@ public class ChatsRepository {
                     for (DocumentChange documentChange: value.getDocumentChanges()){
                         FirebaseChatModel firebaseChat = documentChange.getDocument().toObject(FirebaseChatModel.class);
                         chatList.add(firebaseChat);
+                        firebaseChatModelArrayListMutableLiveData.setValue(chatList);
                     }
                 });
-        return chatList;
+//        return chatList;
     }
 
 }
