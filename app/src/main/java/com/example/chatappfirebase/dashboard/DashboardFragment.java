@@ -5,6 +5,7 @@ import static com.example.chatappfirebase.util.FragmentRedirect.redirectToFragme
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -107,5 +108,21 @@ public class DashboardFragment extends Fragment {
     public void onStart() {
         super.onStart();
         loginViewModel.updateUserStatus();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        requireView().setFocusableInTouchMode(true);
+        requireView().requestFocus();
+        requireView().setOnKeyListener((view, i, keyEvent) -> {
+            if (keyEvent.getAction() == KeyEvent.ACTION_UP && i == KeyEvent.KEYCODE_BACK) {
+                Log.d("Back Button", "back button pressed");
+                requireActivity().finish();
+                return true;
+            }
+            return false;
+        });
+
     }
 }
