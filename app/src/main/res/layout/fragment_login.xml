@@ -60,13 +60,4 @@
         android:textColor="@color/white"
         android:textSize="@dimen/font_normal">
     </android.widget.Button>
-    <ProgressBar
-        android:id="@+id/bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnGenerateOTP"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:visibility="invisible">
-    </ProgressBar>
 </RelativeLayout>

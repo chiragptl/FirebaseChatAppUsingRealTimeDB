@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -30,12 +31,11 @@ import com.google.android.material.tabs.TabLayout;
 public class DashboardFragment extends Fragment {
 
     TabLayout tabLayout;
-    TabItem mChat;
+    TabItem chatTab;
     ViewPager2 viewPager;
     UserListAdapter userListAdapter;
-    androidx.appcompat.widget.Toolbar mToolBar;
+    Toolbar toolBar;
     private LoginViewModel loginViewModel;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,14 +50,14 @@ public class DashboardFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
         tabLayout = view.findViewById(R.id.include);
-        mChat = view.findViewById(R.id.chat);
+        chatTab = view.findViewById(R.id.chat);
         viewPager = view.findViewById(R.id.fragmentContainer);
 
-        mToolBar = view.findViewById(R.id.toolbar);
-        ((AppCompatActivity) requireActivity()).setSupportActionBar(mToolBar);
+        toolBar = view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolBar);
 
         Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_more_vert_24);
-        mToolBar.setOverflowIcon(drawable);
+        toolBar.setOverflowIcon(drawable);
 
         userListAdapter = new UserListAdapter(getChildFragmentManager(), getLifecycle());
         viewPager.setAdapter(userListAdapter);
@@ -123,6 +123,5 @@ public class DashboardFragment extends Fragment {
             }
             return false;
         });
-
     }
 }

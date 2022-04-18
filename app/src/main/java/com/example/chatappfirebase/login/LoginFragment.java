@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,7 +26,6 @@ public class LoginFragment extends Fragment {
     EditText phone;
     Button btnGenOTP;
     FirebaseAuth mAuth;
-    ProgressBar bar;
 
     private LoginViewModel loginViewModel;
 
@@ -45,7 +43,6 @@ public class LoginFragment extends Fragment {
         phone = view.findViewById(R.id.phone);
         btnGenOTP = view.findViewById(R.id.btnGenerateOTP);
         mAuth = FirebaseAuth.getInstance();
-        bar = view.findViewById(R.id.bar);
 
         loginViewModel.userLoggedMutableLiveData.observe(requireActivity(), new Observer<Boolean>() {
             @Override
@@ -62,12 +59,8 @@ public class LoginFragment extends Fragment {
             }
             else {
                 String number = phone.getText().toString();
-                bar.setVisibility(View.VISIBLE);
                 Log.d("phone",number + " from user input");
-
                 loginViewModel.authenticateNumber(number, getActivity());
-
-                bar.setVisibility(View.INVISIBLE);
                 Fragment fragment = new OtpAuthenticationFragment();
                 Bundle authData = loginViewModel.getAuthData();
                 fragment.setArguments(authData);

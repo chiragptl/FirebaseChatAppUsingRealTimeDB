@@ -14,13 +14,20 @@ public class IndividualChatViewModel extends AndroidViewModel {
 
     public IndividualChatRepository repository;
     public MutableLiveData<Messages> editedMessage;
+    public MutableLiveData<String> sentText;
 
     public IndividualChatViewModel(@NonNull Application application) {
         super(application);
         repository = IndividualChatRepository.getInstance(application);
         message = repository.getMessageList();
         editedMessage = repository.getEditedMessage();
+        sentText = repository.getSentText();
     }
+
+    public MutableLiveData<String> getSentText() {
+        return sentText;
+    }
+
     public void LoadChat(String senderReceiver){
         repository.LoadChat(senderReceiver);
     }

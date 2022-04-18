@@ -108,5 +108,10 @@ public class IndividualChatRepository {
                 .push()
                 .setValue(messages).addOnCompleteListener(task1 -> {
                 }));
+        sentText.postValue(null);
+    }
+
+    public MutableLiveData<String> getSentText() {
+        return sentText;
     }
 }

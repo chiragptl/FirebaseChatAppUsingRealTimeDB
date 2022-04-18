@@ -61,13 +61,4 @@
         android:text="@string/verifyOtpBtn"
         android:textColor="@color/white">
     </android.widget.Button>
-    <ProgressBar
-        android:id="@+id/progressBarOfOtpAuth"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/verifyOtp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:visibility="invisible">
-    </ProgressBar>
 </RelativeLayout>

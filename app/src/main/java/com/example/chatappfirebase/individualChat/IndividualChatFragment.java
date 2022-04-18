@@ -4,10 +4,8 @@ import static com.example.chatappfirebase.util.Constants.NAME;
 import static com.example.chatappfirebase.util.Constants.RECEIVER_UID;
 import static com.example.chatappfirebase.util.FragmentRedirect.redirectToFragment;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +17,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -34,18 +33,17 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class IndividualChatFragment extends Fragment {
-    EditText mGetMessage;
-    ImageButton mSendMessageButton;
-    CardView mSendMessageCardView;
-    androidx.appcompat.widget.Toolbar mToolbarOfSpecificChat;
-    ImageView mImageviewOfSpecificUser;
-    TextView mNameOfSpecificUser;
-    ImageButton mBackButtonOfSpecificChat;
-    RecyclerView mMessageRecyclerView;
-    ProgressDialog progressBar;
+    EditText getMessage;
+    ImageButton sendMessageButton;
+    CardView sendMessageCardView;
+    Toolbar toolbarOfSpecificChat;
+    ImageView imageviewOfSpecificUser;
+    TextView nameOfSpecificUser;
+    ImageButton backButtonOfSpecificChat;
+    RecyclerView messageRecyclerView;
 
     private String enteredMessage;
-    String mReceiverName, mReceiverUid, mSenderUid;
+    String receiverName, receiverUid, senderUid;
     String senderReceiver, receiverSender;
 
     IndividualChatMessageAdapter messagesAdapter;
@@ -59,12 +57,12 @@ public class IndividualChatFragment extends Fragment {
         viewModel = new ViewModelProvider(requireActivity()).get(IndividualChatViewModel.class);
 
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-        mSenderUid = firebaseAuth.getUid();
+        senderUid = firebaseAuth.getUid();
         Bundle bundleData = getArguments();
-        mReceiverUid = Objects.requireNonNull(bundleData).getString(RECEIVER_UID);
-        mReceiverName = bundleData.getString(NAME);
-        senderReceiver = mSenderUid + mReceiverUid;
-        receiverSender = mReceiverUid + mSenderUid;
+        receiverUid = Objects.requireNonNull(bundleData).getString(RECEIVER_UID);
+        receiverName = bundleData.getString(NAME);
+        senderReceiver = senderUid + receiverUid;
+        receiverSender = receiverUid + senderUid;
         viewModel.LoadChat(senderReceiver);
 
     }
@@ -74,52 +72,46 @@ public class IndividualChatFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_individual_chat, container, false);
 
-        mGetMessage = view.findViewById(R.id.getMessage);
-        mSendMessageCardView = view.findViewById(R.id.cardViewOfSendMessage);
-        mSendMessageButton = view.findViewById(R.id.imageViewSendMessage);
-        mToolbarOfSpecificChat = view.findViewById(R.id.toolbarOfSpecificChat);
-        mNameOfSpecificUser = view.findViewById(R.id.NameOfSpecificUser);
-        mImageviewOfSpecificUser = view.findViewById(R.id.specificUserImageInImageView);
-        mBackButtonOfSpecificChat = view.findViewById(R.id.backButtonOfSpecificChat);
+        getMessage = view.findViewById(R.id.getMessage);
+        sendMessageCardView = view.findViewById(R.id.cardViewOfSendMessage);
+        sendMessageButton = view.findViewById(R.id.imageViewSendMessage);
+        toolbarOfSpecificChat = view.findViewById(R.id.toolbarOfSpecificChat);
+        nameOfSpecificUser = view.findViewById(R.id.NameOfSpecificUser);
+        imageviewOfSpecificUser = view.findViewById(R.id.specificUserImageInImageView);
+        backButtonOfSpecificChat = view.findViewById(R.id.backButtonOfSpecificChat);
 
-        progressBar = new ProgressDialog(getActivity());
-        progressBar.setCancelable(true);
-        progressBar.setMessage("Loading Chats ...");
-        progressBar.show();
-
-        mMessageRecyclerView = view.findViewById(R.id.recyclerViewOfSpecific);
+        messageRecyclerView = view.findViewById(R.id.recyclerViewOfSpecific);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setStackFromEnd(true);
-        mMessageRecyclerView.setLayoutManager(linearLayoutManager);
+        messageRecyclerView.setLayoutManager(linearLayoutManager);
 
         messagesAdapter = new IndividualChatMessageAdapter(getContext());
 
         viewModel.getMessage().observe(requireActivity(),messagesObserver);
         viewModel.getEditedMessage().observe(requireActivity(),messagesUpdateObserver);
-        mMessageRecyclerView.setAdapter(messagesAdapter);
+        viewModel.getSentText().observe(requireActivity(),sentText);
+        messageRecyclerView.setAdapter(messagesAdapter);
 
 
-        ((AppCompatActivity) requireActivity()).setSupportActionBar(mToolbarOfSpecificChat);
-        mToolbarOfSpecificChat.setOnClickListener(view1 -> Log.d("toolbar", "Toolbar is Clicked"));
+        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbarOfSpecificChat);
+        toolbarOfSpecificChat.setOnClickListener(view1 -> Log.d("toolbar", "Toolbar is Clicked"));
 
-        progressBar.dismiss();
 
-        mBackButtonOfSpecificChat.setOnClickListener(view13 -> {
+        backButtonOfSpecificChat.setOnClickListener(view13 -> {
             Fragment fragment = new DashboardFragment();
             redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
         });
 
-        mNameOfSpecificUser.setText(mReceiverName);
-        Picasso.get().load(R.drawable.default_profile).into(mImageviewOfSpecificUser);
+        nameOfSpecificUser.setText(receiverName);
+        Picasso.get().load(R.drawable.default_profile).into(imageviewOfSpecificUser);
 
-        mSendMessageButton.setOnClickListener(view12 -> {
-            enteredMessage = mGetMessage.getText().toString();
+        sendMessageButton.setOnClickListener(view12 -> {
+            enteredMessage = getMessage.getText().toString();
             if (enteredMessage.isEmpty()) {
                 Log.d("message", "Enter message first");
             } else {
                 viewModel.sendMessage(enteredMessage, senderReceiver, receiverSender);
-                mGetMessage.setText(null);
             }
         });
         return view;
@@ -140,27 +132,11 @@ public class IndividualChatFragment extends Fragment {
         }
     };
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        requireView().setFocusableInTouchMode(true);
-        requireView().requestFocus();
-        requireView().setOnKeyListener((view, i, keyEvent) -> {
-            if (keyEvent.getAction() == KeyEvent.ACTION_UP && i == KeyEvent.KEYCODE_BACK) {
-                Log.d("Back Button", "back button pressed");
-                Fragment fragment = new DashboardFragment();
-                redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
-                return true;
-            }
-            return false;
-        });
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Fragment fragment = new DashboardFragment();
-        redirectToFragment(requireActivity().getSupportFragmentManager(), fragment);
-    }
+    Observer<String> sentText = new Observer<String>() {
+        @Override
+        public void onChanged(String s) {
+            getMessage.setText(s);
+        }
+    };
 
 }
